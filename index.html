@@ -1213,6 +1213,16 @@ const BEL_FR = {"운명": "DESTINÉE", "남성별": "ÉTOILE DE L'HOMME", "여�
     return cardName;
   }
 
+  // 방향태그([Upright]/[Reversed])를 보존하면서 카드명을 영/불어로 변환
+  function getDisplayNameWithDir(cardName) {
+    if (!cardName) return cardName;
+    const dirMatch = cardName.match(/\s*\[(Upright|Reversed)\]\s*$/i);
+    const base = dirMatch ? cardName.slice(0, dirMatch.index).trim() : cardName.trim();
+    const dirTag = dirMatch ? ` [${dirMatch[1]}]` : '';
+    return getDisplayName(base) + dirTag;
+  }
+
+
   function getTabByCardName(name) {
     const stripped = (name || '').replace(/\s*\[(Upright|Reversed)\]\s*$/i, '').trim();
     if (decks.len.includes(stripped)) return 'len';
@@ -1850,8 +1860,8 @@ const BEL_FR = {"운명": "DESTINÉE", "남성별": "ÉTOILE DE L'HOMME", "여�
           const mini = document.createElement('div');
           mini.className = 'reading-card-mini ' + theme;
           mini.innerHTML = svg
-            ? `<svg viewBox="0 0 60 60">${svg}</svg><div class="reading-card-mini-name">${c.name}</div>`
-            : `<div class="reading-card-mini-name">${c.name}</div>`;
+            ? `<svg viewBox="0 0 60 60">${svg}</svg><div class="reading-card-mini-name">${getDisplayNameWithDir(c.name)}</div>`
+            : `<div class="reading-card-mini-name">${getDisplayNameWithDir(c.name)}</div>`;
           cardsRow.appendChild(mini);
         });
       } else {
@@ -1891,7 +1901,7 @@ const BEL_FR = {"운명": "DESTINÉE", "남성별": "ÉTOILE DE L'HOMME", "여�
             ? `<div style="font-size:9.5px;color:var(--accent);opacity:0.6;margin-bottom:1px;font-style:italic;">Archetype: ${c.archetype}</div>`
             : '';
           html += `<div style="padding:2px 0 5px 0;">
-            <div style="font-family:'Cinzel',serif;font-size:10px;color:var(--accent2);margin-bottom:1px;">${c.number}. ${c.name}${pos}</div>
+            <div style="font-family:'Cinzel',serif;font-size:10px;color:var(--accent2);margin-bottom:1px;">${c.number}. ${getDisplayNameWithDir(c.name)}${pos}</div>
             ${archHtml}
             <div style="font-size:11px;line-height:1.6;color:var(--text);">${cleanMultiline(c.meaning).replace(/\n/g,'<br>')}</div>
           </div>`;
@@ -1904,7 +1914,7 @@ const BEL_FR = {"운명": "DESTINÉE", "남성별": "ÉTOILE DE L'HOMME", "여�
       currentReadingText = (q ? `🔮 Question\n${q}\n\n` : '') +
         (result.spread_used ? `${result.spread_used}\n\n` : '') +
         `✨ Reading\n${cleanMultiline(result.summary)}\n\n` +
-        (result.cards?.map(c => `• ${c.name}${c.position ? ' · ' + c.position : ''}: ${cleanMultiline(c.meaning)}`).join('\n') || '') +
+        (result.cards?.map(c => `• ${getDisplayNameWithDir(c.name)}${c.position ? ' · ' + c.position : ''}: ${cleanMultiline(c.meaning)}`).join('\n') || '') +
         (result.starlight_guidance ? `\n\n🌟 Starlight Guidance\n${cleanMultiline(result.starlight_guidance)}` : '') +
         `\n\nWhat does today's card hold for you?\nhttps://starlight-tarot-room.vercel.app`;
       shareBtn.style.display = '';
