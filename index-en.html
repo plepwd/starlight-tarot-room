@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Starlight Tarot Room</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06050f;
+    --surface: #0e0c1e;
+    --surface2: #13112a;
+    --accent: #c9a84c;
+    --accent2: #e8c97a;
+    --text: #f0ebdc;
+    --text-muted: #8a7f6a;
+    --primary: #3a2d6e;
+    --primary-light: #5a4a9e;
+    --card-back-top: #1e1842;
+    --card-back-bot: #120f2e;
+    --rev: #c0392b;
+    --up: #27ae60;
+    --border: rgba(201,168,76,0.2);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body, html {
+    width: 100%; height: 100vh; height: 100dvh;
+    font-family: 'Noto Serif KR', serif;
+    background-color: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 72% 40%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 88% 75%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 90%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(2px 2px at 65% 55%, rgba(201,168,76,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 10%, rgba(255,255,255,0.5) 0%, transparent 100%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .app-container {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    width: 100%; height: 100%;
+    max-width: 600px; margin: 0 auto;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    padding: 8px 14px 8px;
+    background: linear-gradient(180deg, rgba(6,5,15,0.97) 0%, rgba(14,12,30,0.85) 100%);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    position: relative;
+  }
+  .guide-btn {
+    position: absolute;
+    top: 5px; right: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(138,127,106,0.3);
+    border-radius: 50%;
+    width: 24px; height: 24px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    color: var(--text-muted);
+    font-family: 'Cinzel', serif;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+    padding: 0; line-height: 1;
+  }
+  .guide-btn:active { background: rgba(138,127,106,0.15); }
+  .header-title {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; font-weight: 600; letter-spacing: 3px;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(201,168,76,0.4);
+    text-align: center; margin-bottom: 6px;
+  }
+  .question-wrap { display: flex; align-items: center; gap: 7px; }
+  .question-icon { font-size: 13px; flex-shrink: 0; }
+  .question-input {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 7px; height: 34px; padding: 0 11px;
+    font-size: 12px; font-family: 'Noto Serif KR', serif;
+    color: var(--text); outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    caret-color: var(--accent);
+  }
+  .question-input::placeholder { color: var(--text-muted); }
+  .question-input:focus { border-color: rgba(201,168,76,0.45); background: rgba(255,255,255,0.08); }
+  .question-input.filled {
+    border: 1.5px solid rgba(201,168,76,0.6);
+    box-shadow: 0 0 0 1px rgba(201,168,76,0.15), 0 0 10px rgba(201,168,76,0.25);
+  }
+
+  /* ── 탭 ── */
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    padding: 5px 6px; gap: 4px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    flex: 1;
+    min-height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    font-size: 9px; font-family: 'Noto Serif KR', serif;
+    white-space: normal; word-break: keep-all;
+    line-height: 1.3;
+    border-radius: 6px; cursor: pointer;
+    color: var(--text-muted); background: transparent;
+    border: 1px solid transparent;
+    transition: all 0.25s ease; letter-spacing: 0;
+    padding: 6px 2px;
+  }
+  .tab:active { transform: scale(0.97); }
+  .tab.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: var(--accent2); border-color: var(--border); font-weight: 600;
+    box-shadow: 0 2px 12px rgba(58,45,110,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  /* ── 정/Reversed 토글 ── */
+  .dir-toggle-wrap {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 8px;
+    padding: 5px 12px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    transition: opacity 0.2s, height 0.2s, padding 0.2s;
+  }
+  .dir-toggle-wrap.hidden {
+    display: none;
+  }
+  .dir-toggle-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: 'Noto Serif KR', serif;
+    letter-spacing: 0.5px;
+  }
+  .dir-switch {
+    position: relative;
+    display: inline-block;
+    width: 32px; height: 18px;
+    flex-shrink: 0;
+  }
+  .dir-switch input {
+    opacity: 0; width: 0; height: 0;
+  }
+  .dir-slider {
+    position: absolute; cursor: pointer;
+    inset: 0;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    transition: 0.25s;
+  }
+  .dir-slider::before {
+    position: absolute; content: "";
+    width: 12px; height: 12px;
+    left: 2px; top: 2px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    transition: 0.25s;
+  }
+  .dir-switch input:checked + .dir-slider {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-color: rgba(201,168,76,0.3);
+  }
+  .dir-switch input:checked + .dir-slider::before {
+    transform: translateX(14px);
+    background: var(--accent2);
+  }
+
+  /* ── 카드 캔버스 ── */
+  .deck-canvas {
+    flex: 1; display: flex;
+    align-items: center; justify-content: center;
+    padding: 6px 6px;
+    overflow: hidden;
+    background: radial-gradient(ellipse at center, rgba(58,45,110,0.08) 0%, transparent 70%);
+    transition: none;
+  }
+  /* 카드들을 감싸는 내부 wrapper — 폭을 정확히 ncols × cardW로 잡음 */
+  .deck-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    justify-content: center;
+    align-content: center;
+  }
+  /* 탭별 클래스는 식별용으로 유지 */
+  .grid-rw, .grid-maj, .grid-len, .grid-bel { }
+
+  /* UI 숨김 상태 */
+  .ui-hidden .header,
+  .ui-hidden .tabs,
+  .ui-hidden .dir-toggle-wrap,
+  .ui-hidden .footer,
+  .ui-hidden .copyright {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+  }
+  .ui-hidden .footer,
+  .ui-hidden .copyright {
+    transform: translateY(8px);
+  }
+  .header, .tabs, .dir-toggle-wrap, .footer, .copyright {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  /* ── 카드 — 크기는 JS로 동적 설정 ── */
+  .card {
+    position: relative; perspective: 800px;
+    cursor: pointer; aspect-ratio: 1 / 1.7;
+    transition: transform 0.15s ease;
+  }
+  .card:active { transform: scale(0.93); }
+
+  .card-inner {
+    position: relative; width: 100%; height: 100%;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  .card.flipped .card-inner { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute; width: 100%; height: 100%;
+    backface-visibility: hidden;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 3px; overflow: hidden;
+  }
+  .card-back {
+    background: linear-gradient(160deg, var(--card-back-top) 0%, var(--card-back-bot) 100%);
+    border: 0.5px solid rgba(201,168,76,0.25);
+    box-shadow: inset 0 0 8px rgba(58,45,110,0.5);
+  }
+  .card-back::before {
+    content: ''; position: absolute; inset: 2px;
+    border: 0.5px solid rgba(201,168,76,0.12); border-radius: 2px;
+  }
+  .card-back::after { content: "✶"; font-size: 8px; color: rgba(201,168,76,0.45); }
+
+  .card-front {
+    background: linear-gradient(170deg, #12102a 0%, #0d0b20 100%);
+    color: rgba(255,255,255,0.85); transform: rotateY(180deg);
+    font-size: 5px; text-align: center; padding: 2px 1px;
+    flex-direction: column; font-weight: 700; line-height: 1.15;
+    border: 0.5px solid rgba(201,168,76,0.35);
+    box-shadow: 0 0 8px rgba(201,168,76,0.1);
+  }
+  .card-num { font-size: 3.5px; opacity: 0.3; margin-bottom: 1px; font-family: 'Cinzel', serif; }
+  /* 카드 앞면 SVG 심볼 */
+  .card-svg-mini {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    width: 100%; overflow: hidden;
+  }
+  .card-svg-mini svg {
+    width: 70%; height: 70%; fill: none;
+    stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+  }
+  /* 덱 테마별 SVG 색상 */
+  .card-front.theme-gold .card-svg-mini svg { stroke: rgba(201,168,76,0.85); }
+  .card-front.theme-gold .card-svg-mini .f { fill: rgba(201,168,76,0.85); stroke: none; }
+  .card-front.theme-green .card-svg-mini svg { stroke: rgba(94,219,154,0.85); }
+  .card-front.theme-green .card-svg-mini .f { fill: rgba(94,219,154,0.85); stroke: none; }
+  .card-front.theme-purple .card-svg-mini svg { stroke: rgba(192,132,252,0.85); }
+  .card-front.theme-purple .card-svg-mini .f { fill: rgba(192,132,252,0.85); stroke: none; }
+  .card-name {
+    display: flex; align-items: center; justify-content: center;
+    word-break: break-all; font-family: 'Noto Serif KR', serif;
+    font-size: 5px; line-height: 1.2; padding: 0 1px;
+    flex-shrink: 0;
+  }
+  .dir-tag { font-size: 4.5px; margin-top: 1px; font-weight: 900; font-family: 'Cinzel', serif; }
+  .rev { color: var(--rev); }
+  .up  { color: var(--up); }
+
+  /* ── 푸터 (4버튼) ── */
+  .footer {
+    padding: 5px 10px 5px;
+    background: linear-gradient(0deg, rgba(6,5,15,0.97) 0%, rgba(14,12,30,0.85) 100%);
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  /* ── 안내 바 ── */
+  .copyright {
+    flex-shrink: 0;
+    padding: 3px 0 calc(3px + env(safe-area-inset-bottom));
+    background: rgba(6,5,15,0.97);
+    text-align: center;
+    font-size: 9px;
+    color: rgba(138,127,106,0.5);
+    letter-spacing: 0.5px;
+    font-family: 'Noto Serif KR', serif;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .btn {
+    padding: 10px 2px; border: none; border-radius: 8px;
+    font-weight: 600; font-size: 10px; cursor: pointer;
+    font-family: 'Noto Serif KR', serif;
+    line-height: 1.3; transition: opacity 0.15s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .btn:active { opacity: 0.75; }
+  .btn-reset {
+    background: linear-gradient(135deg, #2d2d3e, #1e1e2e);
+    color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);
+  }
+  .btn-view {
+    background: linear-gradient(135deg, #1a5c3a, #0f3d26);
+    color: #5edb9a; border: 1px solid rgba(94,219,154,0.2);
+  }
+  .btn-all {
+    background: linear-gradient(135deg, #4a3500, #2e2000);
+    color: var(--accent2); border: 1px solid rgba(201,168,76,0.35);
+  }
+  .btn-gemini {
+    background: linear-gradient(135deg, #2a1a4a, #1a0f30);
+    color: #c084fc; border: 1px solid rgba(192,132,252,0.3);
+    box-shadow: 0 2px 10px rgba(192,132,252,0.08);
+  }
+  .btn-history {
+    background: linear-gradient(135deg, #4a3500, #2e2000);
+    color: var(--accent2); border: 1px solid rgba(201,168,76,0.35);
+  }
+
+  /* ── 결과 오버레이 ── */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(6,5,15,0.85); backdrop-filter: blur(8px);
+    z-index: 100; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+  .overlay-box {
+    width: min(92vw, 400px);
+    max-height: 88dvh;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 18px;
+    transform: translateY(10px); transition: transform 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .overlay.show .overlay-box { transform: translateY(0); }
+  .overlay-title {
+    font-family: 'Cinzel', serif; font-size: 13px; color: var(--accent);
+    text-align: center; margin-bottom: 14px; letter-spacing: 2px;
+  }
+  .overlay-content {
+    font-size: 12px; line-height: 1.85; color: var(--text);
+    max-height: 52vh; overflow-y: auto;
+    white-space: pre-line; padding: 12px;
+    background: rgba(0,0,0,0.3); border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .overlay-content::-webkit-scrollbar { width: 3px; }
+  .overlay-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .overlay-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .overlay-btn {
+    flex: 1; padding: 11px; border: none; border-radius: 8px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'Noto Serif KR', serif;
+  }
+  .overlay-copy {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: var(--accent2); border: 1px solid var(--border);
+  }
+  .overlay-close {
+    background: rgba(255,255,255,0.06); color: var(--text-muted);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* ── 기록(히스토리) ── */
+  .history-list {
+    max-height: 56vh; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 8px;
+    margin: 0 -2px; padding: 2px;
+  }
+  .history-list::-webkit-scrollbar { width: 3px; }
+  .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .history-item {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 9px; padding: 11px 12px;
+    cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .history-item:active { background: rgba(255,255,255,0.04); }
+  .history-item .hi-date {
+    font-size: 9.5px; color: var(--text-muted);
+    letter-spacing: 0.5px; margin-bottom: 4px;
+    font-family: 'Cinzel', serif;
+  }
+  .history-item .hi-deck {
+    display: inline-block; font-size: 9px;
+    color: var(--accent); border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 4px; padding: 1px 6px; margin-bottom: 5px;
+  }
+  .history-item .hi-q {
+    font-size: 12px; color: var(--text);
+    margin-bottom: 4px; line-height: 1.4;
+    word-break: break-word;
+  }
+  .history-item .hi-cards {
+    font-size: 10.5px; color: var(--text-muted);
+    line-height: 1.5; word-break: break-word;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .history-item .hi-del {
+    position: absolute; top: 8px; right: 8px;
+    width: 22px; height: 22px; border-radius: 5px;
+    background: rgba(192,57,43,0.12); border: 1px solid rgba(192,57,43,0.25);
+    color: rgba(231,111,81,0.9); font-size: 11px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; padding: 0;
+  }
+  .history-empty {
+    text-align: center; color: var(--text-muted);
+    font-size: 12px; padding: 40px 10px; line-height: 1.7;
+  }
+  .history-actions {
+    display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap;
+  }
+  .history-actions .overlay-btn {
+    flex: 1; min-width: 0; padding: 10px 4px; font-size: 11px;
+    white-space: nowrap;
+  }
+  .hist-export { background: rgba(255,255,255,0.06); color: var(--accent); border: 1px solid rgba(201,168,76,0.2); }
+  .hist-import { background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid rgba(255,255,255,0.1); }
+  .hist-clear  { background: rgba(192,57,43,0.12); color: rgba(231,111,81,0.95); border: 1px solid rgba(192,57,43,0.25); }
+  /* 기록 상세 보기 */
+  .hist-detail {
+    font-size: 12px; line-height: 1.85; color: var(--text);
+    white-space: pre-line; padding: 12px;
+    background: rgba(0,0,0,0.3); border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 8px;
+  }
+  .hist-detail::-webkit-scrollbar { width: 3px; }
+  .hist-detail::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* 기록 상세 body 스크롤 — 골드 컬러 */
+  #history-body::-webkit-scrollbar { width: 3px; }
+  #history-body::-webkit-scrollbar-track { background: transparent; }
+  #history-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(201,168,76,0.5), rgba(201,168,76,0.15));
+    border-radius: 3px;
+  }
+  #history-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(201,168,76,0.7);
+  }
+
+  /* ── 사용법 가이드 ── */
+  .guide-content {
+    max-height: 56vh; overflow-y: auto;
+    padding: 4px 12px 4px 4px;
+    text-align: left;
+  }
+  .guide-content::-webkit-scrollbar { width: 3px; }
+  .guide-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .guide-section { margin-bottom: 16px; }
+  .guide-section:last-child { margin-bottom: 4px; }
+  .guide-h {
+    font-family: 'Cinzel', serif;
+    font-size: 12px; color: var(--accent);
+    letter-spacing: 1px; margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+  .guide-content p {
+    font-size: 12px; line-height: 1.7; color: var(--text);
+    margin: 0;
+  }
+  .guide-content ul {
+    margin: 4px 0 0; padding-left: 16px;
+  }
+  .guide-content li {
+    font-size: 12px; line-height: 1.7; color: var(--text);
+    margin-bottom: 3px;
+  }
+  .guide-content b { color: var(--accent2); font-weight: 600; }
+
+  .btn-claude {
+    background: linear-gradient(135deg, #2a1a4a, #1a0f30);
+    color: #c084fc; border: 1px solid rgba(192,132,252,0.3);
+    box-shadow: 0 2px 10px rgba(192,132,252,0.08);
+  }
+
+  /* ── 리딩 공통 바텀시트 ── */
+  .reading-overlay {
+    position: fixed; inset: 0;
+    background: rgba(6,5,15,0.92); backdrop-filter: blur(10px);
+    z-index: 150; display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .reading-overlay.show { opacity: 1; pointer-events: all; }
+  .reading-box {
+    width: 100%; max-width: 600px;
+    max-height: 93dvh;
+    background: var(--surface2);
+    border-radius: 20px 20px 0 0;
+    padding: 18px 18px calc(18px + env(safe-area-inset-bottom));
+    transform: translateY(40px);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  /* Question display */
+  .reading-question {
+    font-size: 12px; line-height: 1.6;
+    color: rgba(255,230,150,0.85);
+    padding: 2px 0;
+    word-break: break-word;
+  }
+  /* 배열법 배지 */
+  .spread-badge {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px;
+    color: var(--accent); opacity: 0.85;
+    padding: 4px 10px; border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 20px; display: inline-block; align-self: flex-start;
+    flex-shrink: 0;
+  }
+  /* SVG 카드줄 */
+  .reading-cards-row {
+    display: flex; gap: 8px; overflow-x: auto;
+    padding-bottom: 8px; flex-shrink: 0;
+  }
+  .reading-cards-row::-webkit-scrollbar { height: 2px; }
+  .reading-cards-row::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 2px; }
+  .reading-card-mini {
+    flex-shrink: 0; width: 100px; height: 170px;
+    border-radius: 6px; position: relative;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden; gap: 3px;
+  }
+  .reading-card-mini.theme-gold {
+    background: linear-gradient(165deg,#1a1530,#0f0c22);
+    border: 1px solid rgba(201,168,76,0.35);
+  }
+  .reading-card-mini.theme-green {
+    background: linear-gradient(165deg,#0e2e1c,#081a10);
+    border: 1px solid rgba(94,219,154,0.35);
+  }
+  .reading-card-mini.theme-purple {
+    background: linear-gradient(165deg,#1e0e38,#130826);
+    border: 1px solid rgba(160,100,240,0.35);
+  }
+  .reading-card-mini svg {
+    width: 72px; height: 72px; fill: none;
+    stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.3;
+  }
+  .reading-card-mini.theme-gold svg { stroke: #e6cd84; }
+  .reading-card-mini.theme-gold svg .f { fill: #e6cd84; stroke: none; }
+  .reading-card-mini.theme-green svg { stroke: #5edb9a; }
+  .reading-card-mini.theme-green svg .f { fill: #5edb9a; stroke: none; }
+  .reading-card-mini.theme-purple svg { stroke: #c084fc; }
+  .reading-card-mini.theme-purple svg .f { fill: #c084fc; stroke: none; }
+  .reading-card-mini-name {
+    font-size: 9px; font-family: 'Cinzel', serif;
+    text-align: center; line-height: 1.3;
+    padding: 0 4px; word-break: break-word;
+    color: rgba(255,255,255,0.6);
+  }
+  /* 별빛의 조언 */
+  .starlight-guidance {
+    padding: 10px 14px;
+    background: rgba(58,45,110,0.18);
+    border-radius: 10px;
+    border: 1px solid rgba(201,168,76,0.12);
+    line-height: 1.7; font-size: 12px;
+  }
+  .starlight-guidance-title {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    color: var(--accent); letter-spacing: 2px;
+    margin-bottom: 8px; opacity: 0.9;
+  }
+  .reading-overlay.show .reading-box { transform: translateY(0); }
+  /* Claude — 보라 */
+  .reading-overlay.theme-claude .reading-box { border: 1px solid rgba(192,132,252,0.2); }
+  .reading-overlay.theme-claude .reading-title { color: #c084fc; }
+  .reading-overlay.theme-claude .reading-spinner { border-color: rgba(192,132,252,0.2); border-top-color: #c084fc; }
+  /* Gemini — 초록 */
+  .reading-overlay.theme-gemini .reading-box { border: 1px solid rgba(110,232,110,0.2); }
+  .reading-overlay.theme-gemini .reading-title { color: #6ee86e; }
+  .reading-overlay.theme-gemini .reading-spinner { border-color: rgba(110,232,110,0.2); border-top-color: #6ee86e; }
+
+  .reading-header {
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  }
+  .reading-title { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 2px; }
+  .reading-close {
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%; width: 28px; height: 28px;
+    color: var(--text-muted); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .reading-body {
+    flex: 1; overflow-y: auto;
+    font-size: 13px; line-height: 1.9; color: var(--text);
+    padding-right: 4px;
+  }
+  .reading-body::-webkit-scrollbar { width: 3px; }
+  .reading-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .reading-loading { display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 13px; }
+  .reading-spinner {
+    width: 18px; height: 18px; border-radius: 50%; border: 2px solid;
+    animation: spin 0.8s linear infinite; flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── 토스트 ── */
+  .toast {
+    position: fixed; bottom: 90px; left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(39,174,96,0.9); color: white;
+    padding: 10px 20px; border-radius: 20px;
+    font-size: 13px; font-family: 'Noto Serif KR', serif;
+    opacity: 0; transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none; z-index: 200;
+    backdrop-filter: blur(8px); white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  #copy-input { position: absolute; left: -9999px; }
+
+  /* ── 카드 상세 팝업 ── */
+  .card-popup {
+    position: fixed; inset: 0; z-index: 300;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.78);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+    backdrop-filter: blur(6px);
+  }
+  .card-popup.show { opacity: 1; pointer-events: all; }
+
+  /* 카드 박스 - 1:1.7 비율 */
+  .card-popup-box {
+    width: 176px; height: 299px;
+    border-radius: 12px;
+    position: relative;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.85);
+    transition: transform 0.2s;
+  }
+  .card-popup.show .card-popup-box { transform: scale(1); }
+
+  /* 테마: 금색(RW/메이저) */
+  .card-popup-box.theme-gold {
+    background: linear-gradient(165deg, #1a1530 0%, #0f0c22 100%);
+    border: 1px solid rgba(201,168,76,0.5);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 30px rgba(201,168,76,0.1);
+  }
+  .card-popup-box.theme-gold::before {
+    content: ''; position: absolute; inset: 4px;
+    border: 0.5px solid rgba(201,168,76,0.3); border-radius: 9px;
+    pointer-events: none; z-index: 1;
+  }
+  /* 테마: 초록(레노먼드) */
+  .card-popup-box.theme-green {
+    background: linear-gradient(165deg, #0e2e1c 0%, #081a10 100%);
+    border: 1px solid rgba(94,219,154,0.45);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 30px rgba(94,219,154,0.08);
+  }
+  .card-popup-box.theme-green::before {
+    content: ''; position: absolute; inset: 4px;
+    border: 0.5px solid rgba(94,219,154,0.22); border-radius: 9px;
+    pointer-events: none; z-index: 1;
+  }
+  /* 테마: 보라(벨린) */
+  .card-popup-box.theme-purple {
+    background: linear-gradient(165deg, #1e0e38 0%, #130826 100%);
+    border: 1px solid rgba(160,100,240,0.5);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 30px rgba(160,100,240,0.1);
+  }
+  .card-popup-box.theme-purple::before {
+    content: ''; position: absolute; inset: 4px;
+    border: 0.5px solid rgba(160,100,240,0.22); border-radius: 9px;
+    pointer-events: none; z-index: 1;
+  }
+
+  /* 코너 숫자 */
+  .p-corner {
+    position: absolute; font-family: 'Cinzel', serif;
+    font-size: 8px; z-index: 3; line-height: 1;
+  }
+  .p-corner.p-tl { top: 8px; left: 10px; }
+  .p-corner.p-br { bottom: 8px; right: 10px; transform: rotate(180deg); }
+  .theme-gold .p-corner { color: rgba(201,168,76,0.7); }
+  .theme-green .p-corner { color: rgba(94,219,154,0.7); }
+  .theme-purple .p-corner { color: rgba(192,132,252,0.7); }
+
+  /* 상단 수트/덱명 */
+  .p-num {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+    text-align: center; padding: 14px 8px 5px;
+    flex-shrink: 0; z-index: 2; line-height: 1.3;
+  }
+  .p-num::after {
+    content: ''; display: block; width: 38%; height: 0.5px;
+    margin: 5px auto 0;
+  }
+  .theme-gold .p-num { color: var(--accent2); }
+  .theme-gold .p-num::after { background: linear-gradient(90deg, transparent, rgba(201,168,76,0.6), transparent); }
+  .theme-green .p-num { color: #8eedb8; }
+  .theme-green .p-num::after { background: linear-gradient(90deg, transparent, rgba(94,219,154,0.5), transparent); }
+  .theme-purple .p-num { color: #d4a8ff; }
+  .theme-purple .p-num::after { background: linear-gradient(90deg, transparent, rgba(192,132,252,0.5), transparent); }
+
+  /* 심볼 영역 (flex:1 → 중앙) */
+  .p-symbol {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    z-index: 2; width: 100%;
+  }
+  .p-symbol svg {
+    width: 108px; height: 108px; fill: none;
+    stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.3;
+  }
+  .theme-gold .p-symbol svg { stroke: var(--accent2); }
+  .theme-gold .p-symbol .f { fill: var(--accent2); stroke: none; }
+  .theme-green .p-symbol svg { stroke: #5edb9a; }
+  .theme-green .p-symbol .f { fill: #5edb9a; stroke: none; }
+  .theme-purple .p-symbol svg { stroke: #c084fc; }
+  .theme-purple .p-symbol .f { fill: #c084fc; stroke: none; }
+
+  /* 하단 카드명 */
+  .p-name {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px;
+    text-align: center; padding: 5px 8px 16px;
+    flex-shrink: 0; z-index: 2;
+    word-break: keep-all; line-height: 1.4;
+  }
+  .p-name::before {
+    content: ''; display: block; width: 38%; height: 0.5px;
+    margin: 0 auto 5px;
+  }
+  .theme-gold .p-name { color: var(--accent2); }
+  .theme-gold .p-name::before { background: linear-gradient(90deg, transparent, rgba(201,168,76,0.6), transparent); }
+  .theme-green .p-name { color: #8eedb8; }
+  .theme-green .p-name::before { background: linear-gradient(90deg, transparent, rgba(94,219,154,0.5), transparent); }
+  .theme-purple .p-name { color: #d4a8ff; }
+  .theme-purple .p-name::before { background: linear-gradient(90deg, transparent, rgba(192,132,252,0.5), transparent); }
+
+  /* 방향 배지 */
+  .p-dir {
+    display: inline-block; font-size: 8px;
+    padding: 2px 7px; border-radius: 10px; margin-top: 5px;
+    letter-spacing: 1px;
+  }
+  .theme-gold .p-dir.rev { background: rgba(192,57,43,0.2); color: #e87060; border: 1px solid rgba(192,57,43,0.3); }
+  .theme-gold .p-dir.up  { background: rgba(39,174,96,0.12); color: #5edb9a; border: 1px solid rgba(39,174,96,0.22); }
+
+    /* ── 설정 오버레이 (API 키) ── */
+  .settings-row {
+    display: flex; flex-direction: column; gap: 10px; margin-top: 4px;
+  }
+  .settings-label {
+    font-size: 11px; color: var(--text-muted); margin-bottom: 2px;
+    font-family: 'Noto Serif KR', serif;
+  }
+  .settings-input {
+    width: 100%; background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+    padding: 10px 12px; font-size: 12px; color: var(--text);
+    font-family: monospace; letter-spacing: 0.5px;
+    outline: none;
+  }
+  .settings-input:focus { border-color: rgba(201,168,76,0.4); }
+  .settings-note {
+    font-size: 10px; color: var(--text-muted);
+    font-family: 'Noto Serif KR', serif; line-height: 1.6; margin-top: 4px;
+  }
+  .settings-save {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: var(--accent2); border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px; padding: 10px; font-size: 12px;
+    font-family: 'Cinzel', serif; cursor: pointer; letter-spacing: 1px;
+    width: 100%; margin-top: 4px;
+  }
+
+  /* ── Share하기 버튼 ── */
+  .reading-share {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 10px; font-size: 11px;
+    font-family: 'Noto Serif KR', serif; color: var(--text-muted);
+    cursor: pointer; margin-top: 8px; width: 100%;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .reading-share:active { background: rgba(255,255,255,0.1); }
+
+  /* ── 스플래시 화면 ── */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(4,3,10,0.92);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 1.4s ease;
+    gap: 0;
+  }
+  #splash.hide { opacity: 0; pointer-events: none; }
+  .splash-circle {
+    width: min(72vw, 72vh);
+    height: min(72vw, 72vh);
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgODAwIiB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCI+CiAgPGRlZnM+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImNlbnRlckdsb3ciIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjUwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZmQ5N2EiIHN0b3Atb3BhY2l0eT0iMC4zIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iNTUlIiBzdG9wLWNvbG9yPSIjYzlhODRjIiBzdG9wLW9wYWNpdHk9IjAuMDgiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjYzlhODRjIiBzdG9wLW9wYWNpdHk9IjAiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9Im91dGVyRmFkZSIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNTAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI2NSUiIHN0b3AtY29sb3I9IiMwNjA1MGYiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwNjA1MGYiIHN0b3Atb3BhY2l0eT0iMC44NSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxmaWx0ZXIgaWQ9Imdsb3ciPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIyLjUiIHJlc3VsdD0iYmx1ciIvPgogICAgICA8ZmVNZXJnZT48ZmVNZXJnZU5vZGUgaW49ImJsdXIiLz48ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz48L2ZlTWVyZ2U+CiAgICA8L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9InN0YXJHbG93Ij4KICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJibHVyIi8+CiAgICAgIDxmZU1lcmdlPjxmZU1lcmdlTm9kZSBpbj0iYmx1ciIvPjxmZU1lcmdlTm9kZSBpbj0iYmx1ciIvPjxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPjwvZmVNZXJnZT4KICAgIDwvZmlsdGVyPgogICAgPGZpbHRlciBpZD0ibW9vbkdsb3ciPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI0IiByZXN1bHQ9ImJsdXIiLz4KICAgICAgPGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJibHVyIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPgogICAgPC9maWx0ZXI+CgogIDxtYXNrIGlkPSJtb29uTWFzayIgbWFza1VuaXRzPSJ1c2VyU3BhY2VPblVzZSIKICAgICAgICB4PSI0MTIiIHk9IjQ0NiIgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMjAiPgogICAgPGNpcmNsZSBjeD0iNTIxLjciIGN5PSI1NTYuMiIgcj0iMTAwIiBmaWxsPSJ3aGl0ZSIvPgogICAgPGNpcmNsZSBjeD0iNTA4LjIiIGN5PSI1MzguOCIgcj0iODgiIGZpbGw9ImJsYWNrIi8+CiAgPC9tYXNrPgogIDwvZGVmcz4KCiAgPCEtLSDrsLDqsr0gLS0+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI4MDAiIGZpbGw9IiMwNjA1MGYiLz4KICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSI0MDAiIHI9IjM5MCIgZmlsbD0idXJsKCNjZW50ZXJHbG93KSIvPgoKICA8ZyBzdHJva2U9IiNjOWE4NGMiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CgogICAgPCEtLSDilZDilZAg7Jm46rO9IOyCvOykkSDrp4EgKOq1teqyjCkg4pWQ4pWQIC0tPgogICAgPGNpcmNsZSBjeD0iNDAwIiBjeT0iNDAwIiByPSIzNzIiIHN0cm9rZS13aWR0aD0iMC44IiBvcGFjaXR5PSIwLjM1Ii8+CiAgICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSI0MDAiIHI9IjM2MCIgc3Ryb2tlLXdpZHRoPSIzLjIiIG9wYWNpdHk9IjAuOTAiIGZpbHRlcj0idXJsKCNnbG93KSIvPgogICAgPGNpcmNsZSBjeD0iNDAwIiBjeT0iNDAwIiByPSIzNDgiIHN0cm9rZS13aWR0aD0iMC44IiBvcGFjaXR5PSIwLjM1Ii8+CgogICAgPCEtLSDsmbjqs70g64iI6riIICgyNOqwnCkgLS0+CiAgICA8ZyBzdHJva2Utd2lkdGg9IjEuNSIgb3BhY2l0eT0iMC41NSI+CiAgICAgIDxsaW5lIHgxPSI0MDAiIHkxPSIyOCIgIHgyPSI0MDAiIHkyPSI1MiIvPgogICAgICA8bGluZSB4MT0iNDAwIiB5MT0iNzQ4IiB4Mj0iNDAwIiB5Mj0iNzcyIi8+CiAgICAgIDxsaW5lIHgxPSIyOCIgIHkxPSI0MDAiIHgyPSI1MiIgIHkyPSI0MDAiLz4KICAgICAgPGxpbmUgeDE9Ijc0OCIgeTE9IjQwMCIgeDI9Ijc3MiIgeTI9IjQwMCIvPgogICAgICA8bGluZSB4MT0iMTQ1IiB5MT0iMTQ1IiB4Mj0iMTYzIiB5Mj0iMTYzIi8+CiAgICAgIDxsaW5lIHgxPSI2NTUiIHkxPSIxNDUiIHgyPSI2MzciIHkyPSIxNjMiLz4KICAgICAgPGxpbmUgeDE9IjE0NSIgeTE9IjY1NSIgeDI9IjE2MyIgeTI9IjYzNyIvPgogICAgICA8bGluZSB4MT0iNjU1IiB5MT0iNjU1IiB4Mj0iNjM3IiB5Mj0iNjM3Ii8+CiAgICAgIDxsaW5lIHgxPSIyNDciIHkxPSI1NyIgIHgyPSIyNTYiIHkyPSI3OCIvPgogICAgICA8bGluZSB4MT0iNTUzIiB5MT0iNTciICB4Mj0iNTQ0IiB5Mj0iNzgiLz4KICAgICAgPGxpbmUgeDE9IjU3IiAgeTE9IjI0NyIgeDI9Ijc4IiAgeTI9IjI1NiIvPgogICAgICA8bGluZSB4MT0iNzQzIiB5MT0iMjQ3IiB4Mj0iNzIyIiB5Mj0iMjU2Ii8+CiAgICAgIDxsaW5lIHgxPSI1NyIgIHkxPSI1NTMiIHgyPSI3OCIgIHkyPSI1NDQiLz4KICAgICAgPGxpbmUgeDE9Ijc0MyIgeTE9IjU1MyIgeDI9IjcyMiIgeTI9IjU0NCIvPgogICAgICA8bGluZSB4MT0iMjQ3IiB5MT0iNzQzIiB4Mj0iMjU2IiB5Mj0iNzIyIi8+CiAgICAgIDxsaW5lIHgxPSI1NTMiIHkxPSI3NDMiIHgyPSI1NDQiIHkyPSI3MjIiLz4KICAgIDwvZz4KCiAgICA8IS0tIOKVkOKVkCDspJHqsIQg7JuQIOKVkOKVkCAtLT4KICAgIDxjaXJjbGUgY3g9IjQwMCIgY3k9IjQwMCIgcj0iMzA4IiBzdHJva2Utd2lkdGg9IjIuMCIgb3BhY2l0eT0iMC42Ii8+CiAgICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSI0MDAiIHI9IjI5NiIgc3Ryb2tlLXdpZHRoPSIwLjYiIG9wYWNpdHk9IjAuMjgiLz4KCiAgICA8IS0tIOKVkOKVkCDtjJTqsIHtmJUg65GQIOqwnCDqtZDssKggKOq1teqyjCkg4pWQ4pWQIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSI0MDAsOTggNjA2LDE5MCA2OTgsNDAwIDYwNiw2MTAgNDAwLDcwMiAxOTQsNjEwIDEwMiw0MDAgMTk0LDE5MCIKICAgICAgICAgICAgIHN0cm9rZS13aWR0aD0iMi4yIiBvcGFjaXR5PSIwLjY1Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjUwMiwxMTIgNjg4LDI5OCA2ODgsNTAyIDUwMiw2ODggMjk4LDY4OCAxMTIsNTAyIDExMiwyOTggMjk4LDExMiIKICAgICAgICAgICAgIHN0cm9rZS13aWR0aD0iMS4yIiBvcGFjaXR5PSIwLjQiLz4KCiAgICA8IS0tIOKVkOKVkCDrgrTrtoAg7Jik6rCB67OEICjqtbXqsowpIOKVkOKVkCAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAwLjAsMTYyLjAgNTM5LjksNTkyLjUgMTczLjYsMzI2LjUgNjI2LjQsMzI2LjUgMjYwLjEsNTkyLjUiCiAgICAgICAgICAgICBzdHJva2Utd2lkdGg9IjIuMCIgb3BhY2l0eT0iMC41NSIvPgoKICAgIDwhLS0g4pWQ4pWQIOuCtOu2gCDsm5Drk6Qg4pWQ4pWQIC0tPgogICAgPGNpcmNsZSBjeD0iNDAwIiBjeT0iNDAwIiByPSIyMzgiIHN0cm9rZS13aWR0aD0iMi44IiBvcGFjaXR5PSIwLjcwIi8+CiAgICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSI0MDAiIHI9IjE2OCIgc3Ryb2tlLXdpZHRoPSIxLjIiIG9wYWNpdHk9IjAuNDUiLz4KICAgIDxjaXJjbGUgY3g9IjQwMCIgY3k9IjQwMCIgcj0iOTgiICBzdHJva2Utd2lkdGg9IjMuNSIgb3BhY2l0eT0iMC44NSIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CiAgICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSI0MDAiIHI9Ijg0IiAgc3Ryb2tlLXdpZHRoPSIwLjciIG9wYWNpdHk9IjAuMzUiLz4KCiAgICA8IS0tIOKVkOKVkCDspJHslZkg7YOc7JaRICjqtbXqsowpIOKVkOKVkCAtLT4KICAgIDxjaXJjbGUgY3g9IjQwMCIgY3k9IjQwMCIgcj0iNDAiIHN0cm9rZS13aWR0aD0iMi41IiBvcGFjaXR5PSIwLjg1IiBmaWx0ZXI9InVybCgjZ2xvdykiLz4KICAgIDxjaXJjbGUgY3g9IjQwMCIgY3k9IjQwMCIgcj0iNiIgIGZpbGw9IiNmZmQ5N2EiIHN0cm9rZT0ibm9uZSIgb3BhY2l0eT0iMS4wIi8+CiAgICA8IS0tIO2DnOyWkSDqtJHshKAgLS0+CiAgICA8ZyBzdHJva2Utd2lkdGg9IjEuNSIgb3BhY2l0eT0iMC42IiBmaWx0ZXI9InVybCgjZ2xvdykiPgogICAgICA8bGluZSB4MT0iNDAwIiB5MT0iMzUyIiB4Mj0iNDAwIiB5Mj0iMzM2Ii8+CiAgICAgIDxsaW5lIHgxPSI0MDAiIHkxPSI0NDgiIHgyPSI0MDAiIHkyPSI0NjQiLz4KICAgICAgPGxpbmUgeDE9IjM1MiIgeTE9IjQwMCIgeDI9IjMzNiIgeTI9IjQwMCIvPgogICAgICA8bGluZSB4MT0iNDQ4IiB5MT0iNDAwIiB4Mj0iNDY0IiB5Mj0iNDAwIi8+CiAgICAgIDxsaW5lIHgxPSIzNzEiIHkxPSIzNzEiIHgyPSIzNTkiIHkyPSIzNTkiLz4KICAgICAgPGxpbmUgeDE9IjQyOSIgeTE9IjM3MSIgeDI9IjQ0MSIgeTI9IjM1OSIvPgogICAgICA8bGluZSB4MT0iMzcxIiB5MT0iNDI5IiB4Mj0iMzU5IiB5Mj0iNDQxIi8+CiAgICAgIDxsaW5lIHgxPSI0MjkiIHkxPSI0MjkiIHgyPSI0NDEiIHkyPSI0NDEiLz4KICAgIDwvZz4KCiAgPC9nPgoKICA8IS0tIOKVkOKVkCDstIjsirnri6wg4oCUIDTsgqzrtoTrqbQsIO2MlOqwge2Yleq8reynk+ygkCg2MDYsNjEwKSDsoJEsIHI9OTgg64K07KCRIOKVkOKVkCAtLT4KICA8ZyBmaWx0ZXI9InVybCgjbW9vbkdsb3cpIj4KICAgIDxjaXJjbGUgY3g9IjUyMS43IiBjeT0iNTU2LjIiIHI9IjEwOCIgZmlsbD0iI2Y1ZTA5OCIgZmlsbC1vcGFjaXR5PSIwLjA1IiBzdHJva2U9Im5vbmUiLz4KICAgIDxjaXJjbGUgY3g9IjUyMS43IiBjeT0iNTU2LjIiIHI9IjEwMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZkOTdhIiBzdHJva2Utd2lkdGg9IjIuNSIgbWFzaz0idXJsKCNtb29uTWFzaykiLz4KICAgIDxjaXJjbGUgY3g9IjUwOC4yIiBjeT0iNTM4LjgiIHI9Ijg4IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmQ5N2EiIHN0cm9rZS13aWR0aD0iMS44IiBtYXNrPSJ1cmwoI21vb25NYXNrKSIvPgogIDwvZz4KCiAgPCEtLSDilZDilZAgOOuwqeychCA06rCBIOuzhOuTpCAo7YGs6rOgIOuqhe2Zle2VmOqyjCkg4pWQ4pWQIC0tPgogIDwhLS0g7IOB64uoIDEy7IucIC0tPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQwMCw4MikiIGZpbHRlcj0idXJsKCNzdGFyR2xvdykiPgogICAgPHBhdGggZD0iTTAsLTE4IEw0LC00IEwxOCwwIEw0LDQgTDAsMTggTC00LDQgTC0xOCwwIEwtNCwtNCBaIgogICAgICAgICAgZmlsbD0iI2ZmZDk3YSIgZmlsbC1vcGFjaXR5PSIwLjkiIHN0cm9rZT0iI2ZmZDk3YSIgc3Ryb2tlLXdpZHRoPSIwLjUiLz4KICAgIDxsaW5lIHgxPSItMjgiIHkxPSIwIiB4Mj0iMjgiIHkyPSIwIiBzdHJva2U9IiNmZmQ5N2EiIHN0cm9rZS13aWR0aD0iMC44IiBvcGFjaXR5PSIwLjU1Ii8+CiAgICA8bGluZSB4MT0iMCIgeTE9Ii0yOCIgeDI9IjAiIHkyPSIyOCIgc3Ryb2tlPSIjZmZkOTdhIiBzdHJva2Utd2lkdGg9IjAuOCIgb3BhY2l0eT0iMC41NSIvPgogIDwvZz4KICA8IS0tIO2VmOuLqCA27IucIC0tPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQwMCw3MTgpIiBmaWx0ZXI9InVybCgjc3Rhckdsb3cpIj4KICAgIDxwYXRoIGQ9Ik0wLC0xNiBMMy44LC0zLjggTDE2LDAgTDMuOCwzLjggTDAsMTYgTC0zLjgsMy44IEwtMTYsMCBMLTMuOCwtMy44IFoiCiAgICAgICAgICBmaWxsPSIjZmZkOTdhIiBmaWxsLW9wYWNpdHk9IjAuODUiIHN0cm9rZT0iI2ZmZDk3YSIgc3Ryb2tlLXdpZHRoPSIwLjUiLz4KICAgIDxsaW5lIHgxPSItMjQiIHkxPSIwIiB4Mj0iMjQiIHkyPSIwIiBzdHJva2U9IiNmZmQ5N2EiIHN0cm9rZS13aWR0aD0iMC43IiBvcGFjaXR5PSIwLjUiLz4KICAgIDxsaW5lIHgxPSIwIiB5MT0iLTI0IiB4Mj0iMCIgeTI9IjI0IiBzdHJva2U9IiNmZmQ5N2EiIHN0cm9rZS13aWR0aD0iMC43IiBvcGFjaXR5PSIwLjUiLz4KICA8L2c+CiAgPCEtLSDsmrDsuKEgM+yLnCAtLT4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3MTgsNDAwKSIgZmlsdGVyPSJ1cmwoI3N0YXJHbG93KSI+CiAgICA8cGF0aCBkPSJNMCwtMTUgTDMuNSwtMy41IEwxNSwwIEwzLjUsMy41IEwwLDE1IEwtMy41LDMuNSBMLTE1LDAgTC0zLjUsLTMuNSBaIgogICAgICAgICAgZmlsbD0iI2ZmZDk3YSIgZmlsbC1vcGFjaXR5PSIwLjgyIiBzdHJva2U9IiNmZmQ5N2EiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgICA8bGluZSB4MT0iLTIyIiB5MT0iMCIgeDI9IjIyIiB5Mj0iMCIgc3Ryb2tlPSIjZmZkOTdhIiBzdHJva2Utd2lkdGg9IjAuNyIgb3BhY2l0eT0iMC40OCIvPgogICAgPGxpbmUgeDE9IjAiIHkxPSItMjIiIHgyPSIwIiB5Mj0iMjIiIHN0cm9rZT0iI2ZmZDk3YSIgc3Ryb2tlLXdpZHRoPSIwLjciIG9wYWNpdHk9IjAuNDgiLz4KICA8L2c+CiAgPCEtLSDsoozsuKEgOeyLnCAtLT4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg4Miw0MDApIiBmaWx0ZXI9InVybCgjc3Rhckdsb3cpIj4KICAgIDxwYXRoIGQ9Ik0wLC0xNSBMMy41LC0zLjUgTDE1LDAgTDMuNSwzLjUgTDAsMTUgTC0zLjUsMy41IEwtMTUsMCBMLTMuNSwtMy41IFoiCiAgICAgICAgICBmaWxsPSIjZmZkOTdhIiBmaWxsLW9wYWNpdHk9IjAuODIiIHN0cm9rZT0iI2ZmZDk3YSIgc3Ryb2tlLXdpZHRoPSIwLjUiLz4KICAgIDxsaW5lIHgxPSItMjIiIHkxPSIwIiB4Mj0iMjIiIHkyPSIwIiBzdHJva2U9IiNmZmQ5N2EiIHN0cm9rZS13aWR0aD0iMC43IiBvcGFjaXR5PSIwLjQ4Ii8+CiAgICA8bGluZSB4MT0iMCIgeTE9Ii0yMiIgeDI9IjAiIHkyPSIyMiIgc3Ryb2tlPSIjZmZkOTdhIiBzdHJva2Utd2lkdGg9IjAuNyIgb3BhY2l0eT0iMC40OCIvPgogIDwvZz4KICA8IS0tIDQ164+EIOyekeydgCDrs4Trk6QgLS0+CiAgPGcgZmlsbD0iI2ZmZDk3YSIgc3Ryb2tlPSJub25lIiBvcGFjaXR5PSIwLjg1IiBmaWx0ZXI9InVybCgjc3Rhckdsb3cpIj4KICAgIDxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE1MiwxNTIpIiBkPSJNMCwtMTEgTDIuNiwtMi42IEwxMSwwIEwyLjYsMi42IEwwLDExIEwtMi42LDIuNiBMLTExLDAgTC0yLjYsLTIuNiBaIi8+CiAgICA8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2NDgsMTUyKSIgZD0iTTAsLTExIEwyLjYsLTIuNiBMMTEsMCBMMi42LDIuNiBMMCwxMSBMLTIuNiwyLjYgTC0xMSwwIEwtMi42LC0yLjYgWiIvPgogICAgPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUyLDY0OCkiIGQ9Ik0wLC0xMSBMMi42LC0yLjYgTDExLDAgTDIuNiwyLjYgTDAsMTEgTC0yLjYsMi42IEwtMTEsMCBMLTIuNiwtMi42IFoiLz4KICAgIDxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDY0OCw2NDgpIiBkPSJNMCwtMTEgTDIuNiwtMi42IEwxMSwwIEwyLjYsMi42IEwwLDExIEwtMi42LDIuNiBMLTExLDAgTC0yLjYsLTIuNiBaIi8+CiAgPC9nPgoKICA8IS0tIOyZuOqzvSDsoJDrk6QgLS0+CiAgPGcgZmlsbD0iI2M5YTg0YyIgc3Ryb2tlPSJub25lIiBvcGFjaXR5PSIwLjQ1Ij4KICAgIDxjaXJjbGUgY3g9IjQwMCIgY3k9IjQwIiAgcj0iMi41Ii8+CiAgICA8Y2lyY2xlIGN4PSI0OTAiIGN5PSI1OCIgIHI9IjEuOCIvPgogICAgPGNpcmNsZSBjeD0iNTAzIiBjeT0iMjI1IiByPSIyLjIiLz4KICAgIDxjaXJjbGUgY3g9IjU0NyIgY3k9IjI2MCIgcj0iMS44Ii8+CiAgICA8Y2lyY2xlIGN4PSI1ODEiIGN5PSIzMDgiIHI9IjIuMiIvPgogICAgPGNpcmNsZSBjeD0iNjAxIiBjeT0iMzY5IiByPSIxLjgiLz4KICAgIDxjaXJjbGUgY3g9IjU5OSIgY3k9IjQ0MiIgcj0iMi4yIi8+CiAgICA8Y2lyY2xlIGN4PSI1NjUiIGN5PSI1MTkiIHI9IjEuOCIvPgogICAgPGNpcmNsZSBjeD0iNDk0IiBjeT0iNTgwIiByPSIyLjIiLz4KICAgIDxjaXJjbGUgY3g9IjQwMCIgY3k9IjYwMyIgcj0iMS44Ii8+CiAgICA8Y2lyY2xlIGN4PSIzMDYiIGN5PSI1ODAiIHI9IjIuMiIvPgogICAgPGNpcmNsZSBjeD0iMjM1IiBjeT0iNTE5IiByPSIxLjgiLz4KICAgIDxjaXJjbGUgY3g9IjIwMSIgY3k9IjQ0MiIgcj0iMi4yIi8+CiAgICA8Y2lyY2xlIGN4PSIxOTkiIGN5PSIzNjkiIHI9IjEuOCIvPgogICAgPGNpcmNsZSBjeD0iMjE5IiBjeT0iMzA4IiByPSIyLjIiLz4KICAgIDxjaXJjbGUgY3g9IjI1MyIgY3k9IjI2MCIgcj0iMS44Ii8+CiAgICA8Y2lyY2xlIGN4PSIyOTciIGN5PSIyMjUiIHI9IjIuMiIvPgogICAgPGNpcmNsZSBjeD0iMzEwIiBjeT0iNTgiICByPSIxLjgiLz4KICA8L2c+CgogIDwhLS0g7Jm46rO9IO2OmOydtOuTnCAtLT4KICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSI0MDAiIHI9IjQwMCIgZmlsbD0idXJsKCNvdXRlckZhZGUpIi8+Cjwvc3ZnPgo=");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: splashRotateGlow 1.2s ease-out forwards;
+    clip-path: circle(50% at 50% 50%);
+  }
+  .splash-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px; letter-spacing: 4px;
+    color: rgba(201,168,76,0.9);
+    margin-top: 24px;
+    text-shadow: 0 0 24px rgba(201,168,76,0.45);
+    animation: splashFadeUp 1s 0.5s ease both;
+  }
+  @keyframes splashFadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes splashRotateGlow {
+    0%   { opacity: 0; filter: brightness(0.4); }
+    40%  { opacity: 1; filter: brightness(0.7); }
+    100% { filter: brightness(1.0); }
+  }
+  @keyframes splashTwinkle {
+    0%   { filter: brightness(0.9) drop-shadow(0 0 2px rgba(201,168,76,0.2)); }
+    50%  { filter: brightness(2.0) drop-shadow(0 0 14px rgba(255,220,100,0.9)); }
+    100% { filter: brightness(1.0) drop-shadow(0 0 4px rgba(201,168,76,0.3)); }
+  }
+
+
+  /* ── 별 접하는 원(r=308) 글로우 링 ── */
+  .splash-magic-wrap {
+    width: min(72vw, 72vh);
+    height: min(72vw, 72vh);
+  }
+
+  /* ── ? 가이드 힌트 ── */
+  #guide-hint {
+    position: fixed; top: 10px; right: 52px;
+    z-index: 9000; display: flex; align-items: center; gap: 6px;
+    animation: hintFade 0.6s ease forwards;
+    pointer-events: none;
+  }
+  #guide-hint.out { animation: hintFadeOut 0.5s ease forwards; }
+  .hint-text {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 11px; color: rgba(255,225,130,0.92);
+    background: rgba(8,6,20,0.88);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 8px; padding: 4px 10px;
+    white-space: nowrap; box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  }
+  .hint-arrow {
+    font-size: 16px; color: rgba(201,168,76,0.9);
+    animation: hintBounce 0.7s ease-in-out infinite alternate;
+  }
+  @keyframes hintFade {
+    from { opacity:0; transform:translateY(-4px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes hintFadeOut {
+    from { opacity:1; } to { opacity:0; }
+  }
+  @keyframes hintBounce {
+    from { transform:translateX(0); } to { transform:translateX(5px); }
+  }
+
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-magic-wrap">
+    <div class="splash-circle"></div>
+  </div>
+  <div class="splash-title">Starlight Tarot</div>
+</div>
+<div id="guide-hint"><div class="hint-text">How to use</div><div class="hint-arrow">→</div></div>
+<div class="app-container">
+
+  <!-- 헤더 -->
+  <div class="header">
+    <div class="header-title" id="header-title" onclick="handleTitleTap()">Starlight Tarot Room<span style="font-size:9px;letter-spacing:1px;color:var(--text-muted);margin-left:7px;font-family:'Noto Serif KR',serif;vertical-align:middle;opacity:0.7;">beta</span></div>
+    <button class="guide-btn" onclick="openGuide()" title="사용법" style="right:12px;">?</button>
+    <button class="guide-btn" id="settings-btn" onclick="openSettings()" title="설정" style="right:42px;display:none;">⚙</button>
+    <div class="question-wrap">
+      <span class="question-icon">🔮</span>
+      <input class="question-input" id="question-input" type="text"
+        placeholder="Ask your question…" maxlength="120"
+        onkeydown="if(event.key==='Enter')this.blur()">
+    </div>
+    <script>
+      (function() {
+        var defaultPlaceholder = 'Ask your question…';
+        var exampleQuestions = [
+          'How will today unfold?',
+          'Where does this relationship stand right now?',
+          'Is this the right direction for me?',
+          'How am I feeling these days, really?',
+          'What happens if I start this?'
+        ];
+        var all = [defaultPlaceholder].concat(exampleQuestions);
+        var input = document.getElementById('question-input');
+        if (!input) return;
+        input.placeholder = all[Math.floor(Math.random() * all.length)];
+
+        // Toggle .filled based on whether input has a value
+        function syncFilled() {
+          input.classList.toggle('filled', input.value.trim().length > 0);
+        }
+        input.addEventListener('input', syncFilled);
+
+        // On tap: if empty and placeholder is an example question, use it as the value
+        input.addEventListener('click', function() {
+          if (input.value.trim() === '' && exampleQuestions.includes(input.placeholder)) {
+            input.value = input.placeholder;
+            syncFilled();
+          }
+        });
+        syncFilled();
+      })();
+    </script>
+  </div>
+
+  <!-- 탭 -->
+  <div class="tabs">
+    <div id="tab-rw"  class="tab active" onclick="switchTab('rw')">Universal Waite</div>
+    <div id="tab-maj" class="tab"        onclick="switchTab('maj')">Major Arcana</div>
+    <div id="tab-len" class="tab"        onclick="switchTab('len')">Lenormand</div>
+    <div id="tab-bel" class="tab"        onclick="switchTab('bel')">Oracle Belline</div>
+  </div>
+
+  <!-- 정/Reversed 토글 (RW, 메이저 아르카나에서만 표시) -->
+  <div class="dir-toggle-wrap" id="dir-toggle-wrap">
+    <span class="dir-toggle-label">Upright / Reversed</span>
+    <label class="dir-switch">
+      <input type="checkbox" id="dir-switch" checked onchange="toggleDir(this.checked)">
+      <span class="dir-slider"></span>
+    </label>
+  </div>
+
+  <!-- 카드: 빈 곳 탭 → UI 토글 -->
+  <div id="canvas" class="deck-canvas grid-rw" onclick="toggleUI()"></div>
+
+  <!-- 푸터 -->
+  <div class="footer" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+    <button class="btn btn-reset"  onclick="shuffleDeck()">🔀 Shuffle</button>
+    <button class="btn btn-view"   onclick="copyAll()">✨ View Spread</button>
+    <button class="btn btn-gemini" onclick="askGemini()">✶ Tarot Reading</button>
+    <button class="btn btn-history" onclick="openHistory()">📜 Journal</button>
+  </div>
+
+  <!-- 안내 바 -->
+  <div class="copyright">© 2026 Starlight Tarot Room · <span style="opacity:0.6;">v0.1.0 (beta)</span></div>
+
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+  <div class="overlay-box">
+    <div class="overlay-title" id="overlay-title">READING RESULT</div>
+    <div class="overlay-content" id="overlay-content"></div>
+    <div class="overlay-actions">
+      <button class="overlay-btn overlay-copy" onclick="copyToClipboard()">Copy</button>
+      <button class="overlay-btn overlay-close" onclick="closeOverlay()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 기록(히스토리) 오버레이 -->
+<div class="overlay" id="history-overlay" onclick="closeHistory(event)">
+  <div class="overlay-box">
+    <div class="overlay-title" id="history-title">My Journal</div>
+    <div id="history-body" style="flex:1;overflow-y:auto;overflow-x:hidden;"></div>
+    <div class="history-actions" id="history-main-actions">
+      <button class="overlay-btn hist-export" onclick="exportHistory()">Export</button>
+      <button class="overlay-btn hist-import" onclick="document.getElementById('import-file').click()">Import</button>
+      <button class="overlay-btn hist-clear" onclick="clearHistory()">Clear all</button>
+      <button class="overlay-btn overlay-close" onclick="closeHistory()">닫기</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importHistory(event)">
+
+<!-- 카드 상세 팝업 -->
+<div class="card-popup" id="card-popup" onclick="closeCardPopup(event)">
+  <div class="card-popup-box theme-gold" id="card-popup-box">
+    <div class="p-corner p-tl" id="p-corner-tl"></div>
+    <div class="p-corner p-br" id="p-corner-br"></div>
+    <div class="p-num" id="p-num"></div>
+    <div class="p-symbol" id="p-symbol"></div>
+    <div class="p-name" id="p-name"></div>
+  </div>
+</div>
+
+<!-- 설정 오버레이 (API 키) -->
+<div class="overlay" id="settings-overlay" onclick="closeSettings(event)">
+  <div class="overlay-box">
+    <div class="overlay-title">⚙ Settings</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Gemini API Key</div>
+        <input class="settings-input" id="gemini-key-input" type="password"
+          placeholder="AIza..." autocomplete="off" spellcheck="false"/>
+        <div class="settings-note">
+          Your key is stored only on this device.<br>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank"
+            style="color:var(--accent);text-decoration:none;">Google AI Studio</a>에서 무료로 발급받을 수 있습니다.
+        </div>
+      </div>
+    </div>
+    <button class="settings-save" onclick="saveSettings()">Save</button>
+    <div class="overlay-actions" style="margin-top:8px">
+      <button class="overlay-btn overlay-close" onclick="closeSettings()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 사용법 가이드 오버레이 -->
+<div class="overlay" id="guide-overlay" onclick="closeGuide(event)">
+  <div class="overlay-box">
+    <div class="overlay-title">How to Use</div>
+    <div class="guide-content">
+      <div class="guide-section">
+        <div class="guide-h">Drawing Cards</div>
+        <p>Tap a card to reveal its face. Tap again to see the card symbol enlarged. Long-press to flip it back.</p>
+      </div>
+      <div class="guide-section">
+        <div class="guide-h">Question Input</div>
+        <p>If you see an example question in the input field, tap it to use that question as-is.</p>
+      </div>
+      <div class="guide-section">
+        <div class="guide-h">Decks</div>
+        <ul class="guide-list">
+          <li><b>Universal Waite</b> — The classic 78-card tarot deck (22 Major + 56 Minor Arcana). Supports upright and reversed readings.</li>
+          <li><b>Major Arcana</b> — A sub-deck of just the 22 Major cards from Universal Waite. Best for exploring life's bigger themes and turning points.</li>
+          <li><b>Lenormand</b> — A 36-card oracle deck focused on practical, everyday situations and concrete context.</li>
+          <li><b>Oracle Belline</b> — A 52-card French oracle deck used for reading the flow of time and signs of what's ahead.</li>
+        </ul>
+        <p style="margin-top:6px; color:var(--text-muted); font-size:11px;">These are general tendencies — you're free to use any deck for any question.</p>
+      </div>
+      <div class="guide-section">
+        <div class="guide-h">Upright & Reversed</div>
+        <p>Universal Waite and Major Arcana support upright and reversed orientations. Use the toggle below the tabs to enable or disable this feature.</p>
+      </div>
+      <div class="guide-section">
+        <div class="guide-h">Bottom Buttons</div>
+        <ul class="guide-list">
+          <li><b>🔀 Shuffle</b> — Reshuffle the deck.</li>
+          <li><b>✨ View Spread</b> — See the cards you've drawn, organized by deck. You can copy the result.</li>
+          <li><b>✶ Tarot Reading</b> — AI reads your cards using carefully crafted interpretation guidelines. Receive an objective and insightful reading drawn from the cards' symbols and spread.</li>
+          <li><b>📜 Journal</b> — View your past readings.</li>
+        </ul>
+        <div class="guide-h">Spread Guide</div>
+        <p style="margin-bottom:6px;">Start by drawing <b>1</b> or <b>3</b> cards. Whatever number feels right, your reading will follow your question.</p>
+
+        <div class="guide-h" style="font-size:0.92em;opacity:0.85;">Advanced Guide</div>
+        <ul class="guide-list">
+          <li><b>1 card — Today's Card</b>: The core message of your current situation.</li>
+          <li><b>2 cards — Two Paths</b>: Situation / Guidance.</li>
+          <li><b>3 cards — Three-Card</b>: [Past-Present-Future] or [Situation-Action-Outcome] depending on the question.<br>
+              <span style="opacity:0.7;font-size:0.95em;">You can also request your preferred interpretation directly in the question field.<br>Example: "Read it as past-present-future"</span></li>
+          <li><b>5 cards — Star Spread</b>: Center, top, bottom, left, right — a panoramic view.</li>
+          <li><b>7 cards — Horseshoe</b>: A 7-step arc from past to future.</li>
+          <li><b>10 cards — Celtic Cross</b>: The classic 10-position deep reading.</li>
+          <li><b>Lenormand · Oracle Belline</b>: Used alongside Waite cards to add practical context and timing.</li>
+        </ul>
+        <div class="guide-h" style="font-size:0.92em;opacity:0.85;">Drawing from multiple decks</div>
+        <ul class="guide-list">
+          <li>Draw Universal Waite 3 + Lenormand 2 + Oracle Belline 2 (great for a focused question),
+              or 4 + 3 + 3 (great for a deeper question),
+              and the three decks are automatically read as one combined story — no extra instructions needed.</li>
+        </ul>
+        <div class="guide-h" style="font-size:0.92em;opacity:0.85;">Example — drawing 4-3-3</div>
+        <ul class="guide-list">
+          <li>Question: <i>"How will this relationship unfold?"</i><br>
+              → All 10 cards across the three decks are read as one <b>combined story</b>.</li>
+          <li>Question: <i>"How will this relationship unfold? no combo"</i><br>
+              → The 4 Waite cards are read as the main spread, while the 3 Lenormand and 3 Belline cards are added only as brief supplemental notes.<br>
+              <span style="opacity:0.7;font-size:0.95em;">(Adding "no combo" to your question turns off the combined reading.)</span></li>
+        </ul>
+        <div class="guide-h" style="font-size:0.92em;opacity:0.85;">Want a different layout?</div>
+        <ul class="guide-list">
+          <li>If you'd like a layout other than these, just describe it in the question field.<br>
+              Example: <i>"I drew 5 cards. Read them as five stages of a relationship (beginning–conflict–turning point–recovery–future)"</i></li>
+        </ul>
+      </div>
+      <div class="guide-section">
+        <div class="guide-h">Tarot Reading Notice</div>
+        <p>Currently free to use without limits. Usage policy may change depending on server conditions and other factors.</p>
+      </div>
+      <div class="guide-section">
+        <div class="guide-h">Journal Storage</div>
+        <p>Readings are automatically saved when you tap View Spread or Tarot Reading. Data is stored locally on this device only and is not synced across devices. You can back up your readings using Export / Import in the Journal screen.</p>
+      </div>
+      <div class="guide-section">
+        <div class="guide-h">Focus Mode</div>
+        <p>Tap an empty area on the card screen to hide the header and buttons. Tap again to bring them back.</p>
+      </div>
+    </div>
+    <div class="overlay-actions">
+      <button class="overlay-btn overlay-close" onclick="closeGuide()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 리딩 바텀시트 -->
+<div class="reading-overlay" id="reading-overlay">
+  <div class="reading-box">
+    <div class="reading-header">
+      <div class="reading-title" id="reading-title">✶ READING</div>
+      <button class="reading-close" onclick="document.getElementById('reading-overlay').classList.remove('show')">✕</button>
+    </div>
+    <div id="reading-question-wrap" style="display:none">
+      <div class="reading-question" id="reading-question"></div>
+    </div>
+    <div id="spread-badge-wrap" style="display:none">
+      <span class="spread-badge" id="spread-badge"></span>
+    </div>
+    <div class="reading-cards-row" id="reading-cards-row" style="display:none"></div>
+    <div class="reading-body" id="reading-body"></div>
+    <button class="reading-share" id="reading-share-btn" onclick="shareReading()" style="display:none">
+      🔗 Share this reading
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="text" id="copy-input">
+
+<script>
+  /* ── 카드 SVG 데이터 ── */
+  const CARD_SVG = {"THE FOOL": "<circle cx=\"26\" cy=\"16\" r=\"5\"/> <path d=\"M26 21 L26 38 M26 27 L18 32 M26 27 L33 31\"/> <path d=\"M26 38 L20 52 M26 38 L32 50\"/> <path d=\"M37 28 Q43 24 41 33\"/> <circle cx=\"14\" cy=\"48\" r=\"2.5\"/> <path d=\"M6 54 Q30 50 54 54\"/> <path d=\"M45 48 L45 40 M42 43 L48 43\" class=\"fill\" stroke=\"var(--gold-light)\" stroke-width=\"1.2\"/>", "THE MAGICIAN": "<path d=\"M22 14 Q18 14 18 17 Q18 20 22 20 Q26 20 26 17 Q26 14 22 14 M22 14 Q26 14 26 11 Q26 8 22 8 Q18 8 18 11 Q18 14 22 14\" transform=\"translate(8,4) scale(0.9)\"/> <path d=\"M30 24 L30 16 M26 12 L30 8 L34 12\"/> <path d=\"M30 40 L30 50 M26 46 L30 50 L34 46\"/> <circle cx=\"16\" cy=\"44\" r=\"2.5\"/> <rect x=\"40\" y=\"40\" width=\"5\" height=\"5\"/> <path d=\"M30 30 L26 36 L34 36 Z\"/>", "THE HIGH PRIESTESS": "<path d=\"M18 12 L18 48 M42 12 L42 48\"/> <path d=\"M24 50 Q30 46 36 50\"/> <path d=\"M30 20 Q24 24 30 34 Q36 24 30 20 Z\" class=\"fill\"/> <circle cx=\"30\" cy=\"42\" r=\"2\"/> <path d=\"M22 14 Q30 18 38 14\"/>", "THE EMPRESS": "<circle cx=\"30\" cy=\"24\" r=\"9\"/> <path d=\"M30 33 L30 50 M23 43 L37 43\"/> <path d=\"M22 14 L25 10 L28 14 L31 9 L34 14 L37 10 L40 14\"/> <path d=\"M14 40 Q16 34 18 40 M46 40 Q44 34 42 40\"/>", "THE EMPEROR": "<path d=\"M20 50 L20 24 L40 24 L40 50\"/> <path d=\"M20 24 L18 18 L24 20 M40 24 L42 18 L36 20\"/> <path d=\"M30 24 L30 50\"/> <circle cx=\"30\" cy=\"14\" r=\"3\"/> <path d=\"M30 17 L30 24\"/>", "THE HIEROPHANT": "<path d=\"M30 12 L30 48\"/> <path d=\"M22 20 L38 20 M24 28 L36 28 M26 36 L34 36\"/> <path d=\"M22 44 L26 52 M38 44 L34 52\"/> <circle cx=\"24\" cy=\"50\" r=\"1.5\" class=\"fill\"/> <circle cx=\"36\" cy=\"50\" r=\"1.5\" class=\"fill\"/>", "THE LOVERS": "<circle cx=\"30\" cy=\"14\" r=\"5\"/> <path d=\"M24 14 Q20 10 24 8 M36 14 Q40 10 36 8\"/> <circle cx=\"20\" cy=\"32\" r=\"4\"/> <path d=\"M20 36 L20 50 M16 42 L24 42\"/> <circle cx=\"40\" cy=\"32\" r=\"4\"/> <path d=\"M40 36 L40 50 M36 42 L44 42\"/> <path d=\"M24 44 Q30 48 36 44\"/>", "THE CHARIOT": "<rect x=\"20\" y=\"28\" width=\"20\" height=\"14\" rx=\"2\"/> <circle cx=\"24\" cy=\"46\" r=\"4\"/> <circle cx=\"36\" cy=\"46\" r=\"4\"/> <path d=\"M22 28 L24 18 L36 18 L38 28\"/> <path d=\"M30 12 L32 17 L30 16 L28 17 Z\" class=\"fill\"/>", "STRENGTH": "<path d=\"M30 16 C25 8 13 8 13 16 C13 24 25 24 30 16 C35 8 47 8 47 16 C47 24 35 24 30 16 Z\"/> <circle cx=\"30\" cy=\"16\" r=\"1.5\" class=\"f\"/> <circle cx=\"18\" cy=\"34\" r=\"4\"/> <path d=\"M18 38 L18 50\"/> <path d=\"M18 44 Q24 42 28 44\"/> <path d=\"M14 48 L18 44 M18 44 L22 48\"/> <path d=\"M32 46 Q36 40 42 40 Q48 40 48 46 Q48 52 42 52 Q36 52 32 46 Z\"/> <path d=\"M36 40 Q38 36 42 36 Q46 38 44 40 Q40 42 36 40\"/> <circle cx=\"42\" cy=\"44\" r=\"2\" class=\"f\"/> <path d=\"M38 48 Q42 50 46 48\"/> <path d=\"M14 28 Q16 24 18 28 M18 28 Q20 24 22 28\" stroke-width=\"1\"/>", "THE HERMIT": "<path d=\"M34 12 L34 50\"/> <path d=\"M22 22 L22 32 L30 32 L30 22 Z\"/> <path d=\"M22 22 Q26 18 30 22\"/> <path d=\"M26 26 L26 28 L24 30 L28 30 Z\" class=\"fill\"/> <circle cx=\"26\" cy=\"27\" r=\"4\" stroke-width=\"1\"/>", "WHEEL OF FORTUNE": "<circle cx=\"30\" cy=\"30\" r=\"16\"/> <circle cx=\"30\" cy=\"30\" r=\"10\"/> <circle cx=\"30\" cy=\"30\" r=\"3.5\"/> <path d=\"M30 14 L30 20 M30 40 L30 46 M14 30 L20 30 M40 30 L46 30\"/> <path d=\"M18.7 18.7 L23 23 M37 37 L41.3 41.3 M41.3 18.7 L37 23 M23 37 L18.7 41.3\"/> <circle cx=\"30\" cy=\"11\" r=\"1\" class=\"fill\"/> <circle cx=\"49\" cy=\"30\" r=\"1\" class=\"fill\"/> <circle cx=\"30\" cy=\"49\" r=\"1\" class=\"fill\"/> <circle cx=\"11\" cy=\"30\" r=\"1\" class=\"fill\"/>", "JUSTICE": "<path d=\"M30 14 L30 44\"/> <path d=\"M18 20 L42 20\"/> <path d=\"M18 20 L14 30 L22 30 Z\"/> <path d=\"M42 20 L38 30 L46 30 Z\"/> <path d=\"M24 44 L36 44 L34 50 L26 50 Z\"/> <circle cx=\"30\" cy=\"14\" r=\"2\"/>", "THE HANGED MAN": "<path d=\"M16 12 L44 12 M30 12 L30 18\"/> <circle cx=\"30\" cy=\"42\" r=\"5\"/> <circle cx=\"30\" cy=\"42\" r=\"8\" stroke-width=\"0.8\" opacity=\"0.5\"/> <path d=\"M30 18 L30 37\"/> <path d=\"M30 24 L24 30 M30 24 L36 30\"/> <path d=\"M30 47 L26 40 M30 47 L34 40\" transform=\"rotate(180 30 43)\"/>", "DEATH": "<path d=\"M20 50 L20 14\"/> <path d=\"M20 14 Q34 12 40 22 Q30 18 20 22\"/> <circle cx=\"40\" cy=\"44\" r=\"5\"/> <path d=\"M40 44 Q37 41 40 39 Q43 41 40 44 M40 44 Q43 47 40 49 Q37 47 40 44\"/> <path d=\"M40 49 L40 54 M37 52 L40 50 L43 52\"/>", "TEMPERANCE": "<path d=\"M20 18 L24 26 L16 26 Z\"/> <path d=\"M40 34 L44 42 L36 42 Z\"/> <path d=\"M22 26 Q30 30 40 34\" stroke-dasharray=\"2 2\"/> <circle cx=\"30\" cy=\"12\" r=\"3\"/> <path d=\"M22 14 Q18 12 20 16 M38 14 Q42 12 40 16\"/>", "THE DEVIL": "<path d=\"M22 22 Q18 14 26 18 M38 22 Q42 14 34 18\"/> <path d=\"M30 16 L26 22 L34 22 Z\"/> <path d=\"M30 22 L30 30 M24 26 L36 26 L33 32 L27 32 Z\"/> <circle cx=\"22\" cy=\"46\" r=\"3\"/> <circle cx=\"38\" cy=\"46\" r=\"3\"/> <path d=\"M25 46 L35 46\" stroke-dasharray=\"1.5 1.5\"/>", "THE TOWER": "<path d=\"M22 50 L22 24 L38 24 L38 50\"/> <path d=\"M22 24 L30 16 L38 24\"/> <path d=\"M32 8 L26 18 L31 17 L27 26\"/> <path d=\"M44 20 L48 16 M46 28 L51 26\" class=\"fill\" stroke=\"var(--gold-light)\" stroke-width=\"1\"/> <path d=\"M14 22 L11 19 M13 30 L9 29\"/>", "THE STAR": "<path d=\"M30 8 L33.5 18.5 L44.5 18.5 L35.5 25 L39 35.5 L30 29 L21 35.5 L24.5 25 L15.5 18.5 L26.5 18.5 Z\" class=\"fill\"/> <path d=\"M20 40 Q24 34 22 48 M40 40 Q36 34 38 48\"/> <path d=\"M14 52 Q30 46 46 52\"/> <circle cx=\"14\" cy=\"20\" r=\"1.3\" class=\"fill\"/> <circle cx=\"46\" cy=\"22\" r=\"1.3\" class=\"fill\"/> <circle cx=\"48\" cy=\"12\" r=\"1\" class=\"fill\"/>", "THE MOON": "<path d=\"M34 12 Q22 16 22 26 Q22 36 34 40 Q26 34 26 26 Q26 18 34 12 Z\" class=\"fill\"/> <path d=\"M14 30 L14 44 M46 30 L46 44\"/> <path d=\"M11 44 L17 44 M43 44 L49 44\"/> <path d=\"M30 44 L30 54\" stroke-dasharray=\"2 2\"/> <path d=\"M22 50 Q30 46 38 50\"/>", "THE SUN": "<circle cx=\"30\" cy=\"28\" r=\"10\"/> <circle cx=\"26\" cy=\"26\" r=\"1\" class=\"fill\"/> <circle cx=\"34\" cy=\"26\" r=\"1\" class=\"fill\"/> <path d=\"M26 31 Q30 34 34 31\"/> <path d=\"M30 8 L30 14 M30 42 L30 48 M8 28 L14 28 M46 28 L52 28 M14 12 L18 16 M42 40 L46 44 M46 12 L42 16 M14 44 L18 40\"/> <path d=\"M18 53 Q30 50 42 53\"/>", "JUDGEMENT": "<path d=\"M16 20 L30 24 L30 30 L16 34 Z\"/> <path d=\"M30 27 L40 27\"/> <path d=\"M36 22 Q40 27 36 32 M40 19 Q46 27 40 35\"/> <circle cx=\"24\" cy=\"46\" r=\"3\"/> <path d=\"M24 49 L24 54 M20 51 L24 50 L28 51\"/>", "THE WORLD": "<ellipse cx=\"30\" cy=\"30\" rx=\"11\" ry=\"17\"/> <path d=\"M30 22 L30 38 M26 27 L30 24 L34 27 M26 33 L30 36 L34 33\"/> <circle cx=\"14\" cy=\"14\" r=\"1.5\" class=\"fill\"/> <circle cx=\"46\" cy=\"14\" r=\"1.5\" class=\"fill\"/> <circle cx=\"14\" cy=\"46\" r=\"1.5\" class=\"fill\"/> <circle cx=\"46\" cy=\"46\" r=\"1.5\" class=\"fill\"/>", "ACE OF WANDS": "<path d=\"M30 52 L30 18\"/> <path d=\"M30 28 Q22 22 24 14 Q30 20 30 28\"/> <path d=\"M30 28 Q38 22 36 14 Q30 20 30 28\"/> <path d=\"M30 22 Q20 18 20 10 Q28 16 30 22\"/> <path d=\"M30 22 Q40 18 40 10 Q32 16 30 22\"/> <path d=\"M30 14 L30 8 M26 11 L22 7 M34 11 L38 7\"/> <path d=\"M22 50 Q30 46 38 50\"/>", "TWO OF WANDS": "<path d=\"M18 12 L18 52 M42 12 L42 52\"/> <circle cx=\"30\" cy=\"32\" r=\"8\"/> <path d=\"M22 32 L38 32 M30 24 L30 40\"/> <path d=\"M26 27 Q30 24 34 27 M26 37 Q30 40 34 37\"/> <circle cx=\"30\" cy=\"18\" r=\"2\"/>", "THREE OF WANDS": "<path d=\"M18 14 L18 54 M30 10 L30 50 M42 14 L42 54\"/> <path d=\"M10 38 Q30 34 50 38\"/> <circle cx=\"30\" cy=\"22\" r=\"3\"/> <path d=\"M30 25 L30 32 M26 28 L34 28\"/>", "FOUR OF WANDS": "<path d=\"M16 14 L16 50 M26 14 L26 50 M34 14 L34 50 M44 14 L44 50\"/> <path d=\"M14 22 Q21 18 28 22 Q35 18 42 22 Q46 18 48 22\"/> <path d=\"M14 28 Q21 24 28 28 Q35 24 42 28 Q46 24 48 28\"/> <circle cx=\"20\" cy=\"38\" r=\"2\" class=\"f\"/> <circle cx=\"30\" cy=\"40\" r=\"2\" class=\"f\"/> <circle cx=\"40\" cy=\"38\" r=\"2\" class=\"f\"/>", "FIVE OF WANDS": "<path d=\"M14 50 L46 10\"/> <path d=\"M46 50 L14 10\"/> <path d=\"M30 8 L30 52\"/> <path d=\"M8 28 L52 32\"/> <path d=\"M12 16 L48 44\"/>", "SIX OF WANDS": "<path d=\"M30 10 L30 52\"/> <path d=\"M16 18 L44 18 M14 26 L46 26 M16 34 L44 34 M18 42 L42 42\"/> <path d=\"M22 10 Q30 6 38 10 Q30 14 22 10 Z\" class=\"f\"/> <circle cx=\"30\" cy=\"10\" r=\"2\" class=\"f\"/>", "SEVEN OF WANDS": "<path d=\"M30 8 L30 52\"/> <path d=\"M12 24 L28 32 M12 32 L28 38 M12 40 L28 46\"/> <path d=\"M48 24 L32 32 M48 32 L32 38 M48 40 L32 46\"/> <circle cx=\"30\" cy=\"18\" r=\"3\"/> <path d=\"M27 21 L33 21\"/>", "EIGHT OF WANDS": "<path d=\"M10 14 L50 46 M10 20 L50 52 M10 8 L50 40\"/> <path d=\"M14 10 L50 34 M16 6 L50 28 M12 18 L50 42\"/> <path d=\"M46 28 L52 30 L50 36\"/> <path d=\"M48 22 L52 24 L50 30\"/>", "NINE OF WANDS": "<path d=\"M14 14 L14 52 M20 14 L20 52 M26 14 L26 52 M32 14 L32 52 M38 14 L38 52 M44 14 L44 52 M50 14 L50 52\"/> <circle cx=\"30\" cy=\"26\" r=\"4\"/> <path d=\"M26 24 Q24 20 28 20\"/> <path d=\"M30 30 L30 46 M26 38 L34 38\"/>", "TEN OF WANDS": "<path d=\"M20 8 L20 44 M23 8 L23 44 M26 8 L26 44 M29 8 L29 44 M32 8 L32 44 M35 8 L35 44 M38 8 L38 44 M41 8 L41 44\"/> <path d=\"M18 10 Q30 6 44 10\"/> <path d=\"M18 44 Q30 40 44 44\"/> <circle cx=\"30\" cy=\"50\" r=\"3\"/> <path d=\"M27 53 L33 53\"/>", "PAGE OF WANDS": "<path d=\"M32 10 L32 50\"/> <path d=\"M32 20 Q24 16 26 10 Q32 16 32 20\"/> <path d=\"M32 20 Q40 16 38 10 Q32 16 32 20\"/> <circle cx=\"24\" cy=\"34\" r=\"5\"/> <path d=\"M24 39 L24 52\"/> <path d=\"M20 44 Q24 48 28 44\"/> <path d=\"M18 36 L14 40 M14 36 L18 38\"/>", "KNIGHT OF WANDS": "<path d=\"M42 12 L42 36\"/> <path d=\"M42 20 Q36 16 38 10 Q42 16 42 20\"/> <path d=\"M42 20 Q48 16 46 10 Q42 16 42 20\"/> <path d=\"M16 42 Q22 34 30 36 Q38 38 42 34 L42 42 Q36 46 26 44 Z\"/> <path d=\"M18 42 L16 50 M22 44 L22 52\"/> <path d=\"M38 16 L44 10 M44 16 L46 10\" stroke-width=\"1\"/>", "QUEEN OF WANDS": "<path d=\"M38 14 L38 48\"/> <path d=\"M38 22 Q30 18 32 12 Q38 18 38 22\"/> <path d=\"M38 22 Q46 18 44 12 Q38 18 38 22\"/> <circle cx=\"22\" cy=\"28\" r=\"8\"/> <path d=\"M16 26 L14 22 M16 30 L12 32 M28 26 L30 22 M28 30 L32 32\"/> <path d=\"M18 34 Q22 38 26 34\"/> <circle cx=\"22\" cy=\"26\" r=\"1.5\" class=\"f\"/> <circle cx=\"22\" cy=\"30\" r=\"1.5\" class=\"f\"/>", "KING OF WANDS": "<path d=\"M40 14 L40 48\"/> <path d=\"M40 22 Q32 18 34 12 Q40 18 40 22\"/> <path d=\"M40 22 Q48 18 46 12 Q40 18 40 22\"/> <path d=\"M16 26 L16 46 L34 46 L34 26 Z\"/> <path d=\"M16 26 L20 18 L25 22 L25 18 L30 14 L35 18 L35 22 L34 26\"/> <path d=\"M10 46 Q16 42 22 46 M28 46 Q34 42 40 46\"/> <path d=\"M36 48 Q40 52 44 48 Q46 52 50 48\" stroke-width=\"1\"/>", "ACE OF CUPS": "<path d=\"M20 28 Q20 22 30 22 Q40 22 40 28 L36 44 L24 44 Z\"/> <path d=\"M24 44 L22 50 L38 50 L36 44\"/> <path d=\"M22 50 L18 54 L42 54 L38 50\"/> <path d=\"M26 28 Q30 24 34 28\"/> <path d=\"M30 14 L30 22 M26 16 L22 12 M34 16 L38 12\"/> <path d=\"M24 36 Q30 32 36 36\" stroke-dasharray=\"2 1.5\"/>", "TWO OF CUPS": "<path d=\"M16 24 Q16 20 20 20 Q24 20 24 24 L22 36 L18 36 Z\"/> <path d=\"M18 36 L17 40 L23 40 L22 36\"/> <path d=\"M36 24 Q36 20 40 20 Q44 20 44 24 L42 36 L38 36 Z\"/> <path d=\"M38 36 L37 40 L43 40 L42 36\"/> <path d=\"M24 30 Q30 26 36 30\"/> <circle cx=\"20\" cy=\"46\" r=\"3\"/> <circle cx=\"40\" cy=\"46\" r=\"3\"/> <path d=\"M23 46 Q30 50 37 46\"/>", "THREE OF CUPS": "<path d=\"M16 20 Q16 16 20 16 Q24 16 24 20 L22 30 L18 30 Z\"/> <path d=\"M18 30 L17 34 L23 34 L22 30\"/> <path d=\"M26 14 Q26 10 30 10 Q34 10 34 14 L32 24 L28 24 Z\"/> <path d=\"M28 24 L27 28 L33 28 L32 24\"/> <path d=\"M36 20 Q36 16 40 16 Q44 16 44 20 L42 30 L38 30 Z\"/> <path d=\"M38 30 L37 34 L43 34 L42 30\"/> <path d=\"M20 38 Q30 42 40 38\"/> <circle cx=\"20\" cy=\"48\" r=\"2\" class=\"f\"/> <circle cx=\"30\" cy=\"50\" r=\"2\" class=\"f\"/> <circle cx=\"40\" cy=\"48\" r=\"2\" class=\"f\"/>", "FOUR OF CUPS": "<path d=\"M12 32 Q12 28 16 28 Q20 28 20 32 L18 42 L14 42 Z\"/> <path d=\"M14 42 L13 46 L19 46 L18 42\"/> <path d=\"M26 32 Q26 28 30 28 Q34 28 34 32 L32 42 L28 42 Z\"/> <path d=\"M28 42 L27 46 L33 46 L32 42\"/> <path d=\"M40 32 Q40 28 44 28 Q48 28 48 32 L46 42 L42 42 Z\"/> <path d=\"M42 42 L41 46 L47 46 L46 42\"/> <!-- 4번째 컵 (점으로) --> <circle cx=\"30\" cy=\"52\" r=\"2.5\" class=\"f\"/> <!-- 명상 인물 --> <circle cx=\"30\" cy=\"18\" r=\"4\"/> <path d=\"M26 18 L22 18 M34 18 L38 18\"/> <!-- 허공에서 나오는 컵 암시 --> <path d=\"M45 20 Q48 16 50 20 Q48 24 45 20\" stroke-width=\"1.2\"/>", "FIVE OF CUPS": "<!-- 쏟아진 세 컵 --> <path d=\"M18 24 Q18 20 22 20 Q26 20 26 24 L25 30 L19 30 Z\"/> <path d=\"M19 30 L18 33\"/> <path d=\"M30 20 Q30 16 34 16 Q38 16 38 20 L36 28 L32 28 Z\"/> <path d=\"M32 28 L30 32\"/> <path d=\"M42 24 Q42 20 46 20 Q50 20 50 24 L48 30 L44 30 Z\"/> <path d=\"M44 30 L42 34\"/> <path d=\"M16 34 Q26 38 32 34 Q38 38 44 34\" stroke-dasharray=\"2 1.5\"/> <!-- 남은 두 컵 (뒤) --> <path d=\"M10 42 Q10 38 14 38 Q18 38 18 42 L17 50 L11 50 Z\"/> <path d=\"M11 50 L10 54 L18 54 L17 50\"/> <path d=\"M20 42 Q20 38 24 38 Q28 38 28 42 L27 50 L21 50 Z\"/> <path d=\"M21 50 L20 54 L28 54 L27 50\"/>", "SIX OF CUPS": "<path d=\"M14 34 Q14 30 18 30 Q22 30 22 34 L20 44 L16 44 Z\"/> <path d=\"M16 44 L15 48 L21 48 L20 44\"/> <path d=\"M26 38 Q26 34 30 34 Q34 34 34 38 L32 48 L28 48 Z\"/> <path d=\"M28 48 L27 52 L33 52 L32 48\"/> <path d=\"M38 34 Q38 30 42 30 Q46 30 46 34 L44 44 L40 44 Z\"/> <path d=\"M40 44 L39 48 L45 48 L44 44\"/> <!-- 나머지 3개 컵 (점으로) --> <circle cx=\"14\" cy=\"26\" r=\"2\" class=\"f\"/> <circle cx=\"30\" cy=\"26\" r=\"2\" class=\"f\"/> <circle cx=\"46\" cy=\"26\" r=\"2\" class=\"f\"/> <!-- 꽃 --> <circle cx=\"18\" cy=\"18\" r=\"3\"/> <path d=\"M15 18 L12 18 M21 18 L24 18 M18 15 L18 12 M18 21 L18 24\"/>", "SEVEN OF CUPS": "<!-- 컵 4개 (위 2, 아래 2) --> <path d=\"M10 20 Q10 17 13 17 Q16 17 16 20 L15 27 L11 27 Z\"/> <path d=\"M22 16 Q22 13 25 13 Q28 13 28 16 L27 23 L23 23 Z\"/> <path d=\"M34 20 Q34 17 37 17 Q40 17 40 20 L39 27 L35 27 Z\"/> <path d=\"M46 16 Q46 13 49 13 Q52 13 52 16 L51 23 L47 23 Z\"/> <!-- 구름 --> <path d=\"M8 28 Q16 24 24 28 Q32 24 40 28 Q48 24 54 28\"/> <!-- 나머지 3개 (점) --> <circle cx=\"18\" cy=\"36\" r=\"2\" class=\"f\"/> <circle cx=\"30\" cy=\"36\" r=\"2\" class=\"f\"/> <circle cx=\"42\" cy=\"36\" r=\"2\" class=\"f\"/> <!-- 인물 --> <circle cx=\"30\" cy=\"50\" r=\"4\"/> <path d=\"M26 48 L22 46 M34 48 L38 46\"/>", "EIGHT OF CUPS": "<!-- 컵 3개 --> <path d=\"M8 44 Q8 40 12 40 Q16 40 16 44 L15 52 L9 52 Z\"/> <path d=\"M19 44 Q19 40 23 40 Q27 40 27 44 L26 52 L20 52 Z\"/> <path d=\"M30 44 Q30 40 34 40 Q38 40 38 44 L37 52 L31 52 Z\"/> <!-- 나머지 5개 (막대) --> <path d=\"M10 36 L10 38 M20 36 L20 38 M30 36 L30 38 M40 36 L40 38 M50 36 L50 38\"/> <!-- 달 (왼쪽 상단) --> <path d=\"M14 12 Q8 16 8 22 Q8 28 14 32 Q10 26 10 22 Q10 18 14 12 Z\" class=\"f\"/> <!-- 인물 (오른쪽, 달과 분리) --> <circle cx=\"48\" cy=\"20\" r=\"4\"/> <path d=\"M48 24 L48 34 M44 30 L48 34 L52 30\"/>", "NINE OF CUPS": "<!-- 컵 8개 (4x2) --> <path d=\"M8 20 Q8 17 11 17 Q14 17 14 20 L13 27 L9 27 Z\"/> <path d=\"M18 20 Q18 17 21 17 Q24 17 24 20 L23 27 L19 27 Z\"/> <path d=\"M28 20 Q28 17 31 17 Q34 17 34 20 L33 27 L29 27 Z\"/> <path d=\"M38 20 Q38 17 41 17 Q44 17 44 20 L43 27 L39 27 Z\"/> <path d=\"M8 33 Q8 30 11 30 Q14 30 14 33 L13 40 L9 40 Z\"/> <path d=\"M18 33 Q18 30 21 30 Q24 30 24 33 L23 40 L19 40 Z\"/> <path d=\"M28 33 Q28 30 31 30 Q34 30 34 33 L33 40 L29 40 Z\"/> <path d=\"M38 33 Q38 30 41 30 Q44 30 44 33 L43 40 L39 40 Z\"/> <!-- 9번째 컵 --> <path d=\"M48 20 Q48 17 51 17 Q54 17 54 20 L53 27 L49 27 Z\"/> <!-- 인물 (만족) --> <circle cx=\"30\" cy=\"50\" r=\"4\"/> <path d=\"M28 53 Q30 56 32 53\"/>", "TEN OF CUPS": "<!-- 무지개 호 --> <path d=\"M10 32 Q30 16 50 32\" stroke-dasharray=\"2 1.5\"/> <!-- 컵 5개 (호 위에) --> <path d=\"M12 30 Q12 27 15 27 Q18 27 18 30 L17 36 L13 36 Z\"/> <path d=\"M20 24 Q20 21 23 21 Q26 21 26 24 L25 30 L21 30 Z\"/> <path d=\"M28 20 Q28 17 31 17 Q34 17 34 20 L33 26 L29 26 Z\"/> <path d=\"M36 24 Q36 21 39 21 Q42 21 42 24 L41 30 L37 30 Z\"/> <path d=\"M44 30 Q44 27 47 27 Q50 27 50 30 L49 36 L45 36 Z\"/> <!-- 나머지 5개 (점) --> <circle cx=\"14\" cy=\"40\" r=\"1.8\" class=\"f\"/> <circle cx=\"22\" cy=\"36\" r=\"1.8\" class=\"f\"/> <circle cx=\"30\" cy=\"34\" r=\"1.8\" class=\"f\"/> <circle cx=\"38\" cy=\"36\" r=\"1.8\" class=\"f\"/> <circle cx=\"46\" cy=\"40\" r=\"1.8\" class=\"f\"/> <!-- 가족 --> <circle cx=\"22\" cy=\"50\" r=\"3\"/> <circle cx=\"38\" cy=\"50\" r=\"3\"/> <circle cx=\"30\" cy=\"54\" r=\"2.5\"/> <path d=\"M25 50 L35 50\"/>", "PAGE OF CUPS": "<path d=\"M22 30 Q22 26 26 26 Q30 26 30 30 L28 40 L24 40 Z\"/> <path d=\"M24 40 L23 44 L29 44 L28 40\"/> <!-- 컵에서 나오는 물고기 --> <path d=\"M30 28 Q36 24 40 28 Q36 32 30 28 Z\" class=\"f\"/> <path d=\"M38 26 L42 22 M38 30 L42 34\"/> <!-- 인물 --> <circle cx=\"26\" cy=\"20\" r=\"4\"/> <path d=\"M22 20 L18 20 M30 20 L34 20\"/> <!-- 물결 --> <path d=\"M14 50 Q22 46 30 50 Q38 46 46 50\"/>", "KNIGHT OF CUPS": "<!-- 컵 --> <path d=\"M34 14 Q34 10 38 10 Q42 10 42 14 L40 24 L36 24 Z\"/> <path d=\"M36 24 L35 28 L41 28 L40 24\"/> <!-- 말 --> <path d=\"M14 40 Q20 32 28 34 Q36 36 40 30 L42 36 Q38 44 28 42 Z\"/> <path d=\"M14 40 L12 48 M20 42 L20 50\"/> <path d=\"M40 30 Q44 28 46 32\"/> <!-- 물결 --> <path d=\"M10 52 Q20 48 30 52 Q40 48 50 52\"/>", "QUEEN OF CUPS": "<!-- 정교한 컵 --> <path d=\"M26 16 Q26 10 30 10 Q34 10 34 16 L32 28 L28 28 Z\"/> <path d=\"M28 28 L27 32 L33 32 L32 28\"/> <path d=\"M24 32 L36 32 L34 36 L26 36 Z\"/> <!-- 왕좌 --> <path d=\"M18 36 L18 54 L42 54 L42 36\"/> <path d=\"M18 36 L20 28 L22 32 L26 26 L30 22 L34 26 L38 32 L40 28 L42 36\"/> <!-- 물결 --> <path d=\"M14 52 Q22 48 30 52 Q38 48 46 52\" stroke-dasharray=\"2 1.5\"/>", "KING OF CUPS": "<!-- 컵 (왕의 권위) --> <path d=\"M28 14 Q28 8 32 8 Q36 8 36 14 L34 24 L30 24 Z\"/> <path d=\"M30 24 L29 28 L35 28 L34 24\"/> <path d=\"M26 28 L38 28 L36 32 L28 32 Z\"/> <!-- 왕좌 --> <path d=\"M16 32 L16 54 L44 54 L44 32\"/> <path d=\"M16 32 L20 24 L24 28 L28 20 L32 16 L36 20 L40 28 L44 24 L44 32\"/> <!-- 바다 물결 --> <path d=\"M10 50 Q18 46 26 50 Q34 46 42 50 Q46 48 50 50\"/> <path d=\"M8 54 Q16 50 24 54 Q32 50 40 54\"/>", "ACE OF SWORDS": "<!-- 검 --> <path d=\"M30 8 L30 46\"/> <path d=\"M26 44 L34 44\"/> <path d=\"M24 46 L36 46\"/> <!-- 손잡이 --> <path d=\"M22 42 L38 42\"/> <!-- 왕관 --> <path d=\"M22 8 L25 14 L28 8 L30 12 L32 8 L35 14 L38 8\"/> <path d=\"M22 8 L38 8\"/> <!-- 월계관 잎 --> <path d=\"M16 20 Q12 16 14 12 Q18 16 16 20\"/> <path d=\"M44 20 Q48 16 46 12 Q42 16 44 20\"/> <path d=\"M14 26 Q10 22 12 18 Q16 22 14 26\"/> <path d=\"M46 26 Q50 22 48 18 Q44 22 46 26\"/>", "TWO OF SWORDS": "<!-- 교차하는 두 검 --> <path d=\"M14 10 L46 50\"/> <path d=\"M46 10 L14 50\"/> <path d=\"M12 12 L16 8 M44 8 L48 12\"/> <path d=\"M12 48 L16 52 M44 52 L48 48\"/> <!-- 눈가리개 인물 --> <circle cx=\"30\" cy=\"30\" r=\"5\"/> <path d=\"M25 30 L20 30 M35 30 L40 30\"/>", "THREE OF SWORDS": "<!-- 심장 --> <path d=\"M30 46 Q14 34 14 24 Q14 16 22 16 Q28 16 30 22 Q32 16 38 16 Q46 16 46 24 Q46 34 30 46 Z\"/> <!-- 세 검 관통 --> <path d=\"M30 8 L30 52\"/> <path d=\"M18 12 L42 48\"/> <path d=\"M42 12 L18 48\"/> <!-- 검 끝 --> <path d=\"M29 8 L30 6 L31 8\"/> <path d=\"M17 12 L18 10 L19 12\"/> <path d=\"M41 12 L42 10 L43 12\"/>", "FOUR OF SWORDS": "<!-- 수평으로 누운 검 3개 --> <path d=\"M10 20 L50 20\"/> <path d=\"M10 26 L50 26\"/> <path d=\"M10 32 L50 32\"/> <!-- 검 끝 --> <path d=\"M48 18 L50 20 L48 22\"/> <path d=\"M48 24 L50 26 L48 28\"/> <path d=\"M48 30 L50 32 L48 34\"/> <!-- 수직 검 1개 (옆) --> <path d=\"M14 36 L14 54\"/> <path d=\"M13 36 L14 34 L15 36\"/> <!-- 누운 인물 --> <path d=\"M22 44 L50 44 L50 54 L22 54 Z\"/> <circle cx=\"26\" cy=\"49\" r=\"3\"/>", "FIVE OF SWORDS": "<!-- 세 검 (승자가 거둠) --> <path d=\"M30 10 L30 36\"/> <path d=\"M24 14 L24 38\"/> <path d=\"M36 14 L36 38\"/> <path d=\"M29 10 L30 8 L31 10\"/> <path d=\"M23 14 L24 12 L25 14\"/> <path d=\"M35 14 L36 12 L37 14\"/> <!-- 땅에 버려진 두 검 (점) --> <circle cx=\"14\" cy=\"50\" r=\"2\" class=\"f\"/> <circle cx=\"46\" cy=\"50\" r=\"2\" class=\"f\"/> <path d=\"M10 52 L18 52 M42 52 L50 52\"/> <!-- 인물들 --> <circle cx=\"30\" cy=\"44\" r=\"4\"/> <path d=\"M14 46 L18 44 M46 46 L42 44\"/>", "SIX OF SWORDS": "<!-- 배 --> <path d=\"M14 40 Q30 36 46 40 L42 50 L18 50 Z\"/> <!-- 검 6개 (배에 꽂힌 세로 검) --> <path d=\"M20 28 L20 42 M24 26 L24 42 M28 24 L28 42\"/> <path d=\"M32 24 L32 42 M36 26 L36 42 M40 28 L40 42\"/> <!-- 검 끝 --> <path d=\"M19 28 L20 26 L21 28\"/> <path d=\"M23 26 L24 24 L25 26\"/> <path d=\"M27 24 L28 22 L29 24\"/> <path d=\"M31 24 L32 22 L33 24\"/> <path d=\"M35 26 L36 24 L37 26\"/> <path d=\"M39 28 L40 26 L41 28\"/> <!-- 물결 --> <path d=\"M10 52 Q20 48 30 52 Q40 48 50 52\"/> <!-- 인물 --> <circle cx=\"44\" cy=\"36\" r=\"3\"/>", "SEVEN OF SWORDS": "<!-- 들고 가는 검 5개 --> <path d=\"M24 14 L24 44 M28 12 L28 44 M32 12 L32 44 M36 14 L36 44 M40 16 L40 44\"/> <path d=\"M23 14 L24 12 L25 14\"/> <path d=\"M27 12 L28 10 L29 12\"/> <path d=\"M31 12 L32 10 L33 12\"/> <path d=\"M35 14 L36 12 L37 14\"/> <path d=\"M39 16 L40 14 L41 16\"/> <!-- 남은 두 검 (점) --> <circle cx=\"12\" cy=\"46\" r=\"2\" class=\"f\"/> <circle cx=\"18\" cy=\"46\" r=\"2\" class=\"f\"/> <path d=\"M10 50 L14 46 M16 50 L20 46\"/> <!-- 인물 (몰래) --> <circle cx=\"30\" cy=\"52\" r=\"3\"/> <path d=\"M27 52 L22 52 M33 52 L38 52\"/>", "EIGHT OF SWORDS": "<!-- 양쪽 검 울타리 --> <path d=\"M10 12 L10 44 M14 10 L14 44 M16 12 L16 44 M20 10 L20 44\"/> <path d=\"M40 10 L40 44 M44 12 L44 44 M46 10 L46 44 M50 12 L50 44\"/> <!-- 검 끝 --> <path d=\"M9 12 L10 10 L11 12\"/> <path d=\"M13 10 L14 8 L15 10\"/> <path d=\"M15 12 L16 10 L17 12\"/> <path d=\"M19 10 L20 8 L21 10\"/> <path d=\"M39 10 L40 8 L41 10\"/> <path d=\"M43 12 L44 10 L45 12\"/> <path d=\"M45 10 L46 8 L47 10\"/> <path d=\"M49 12 L50 10 L51 12\"/> <!-- 묶인 인물 --> <circle cx=\"30\" cy=\"28\" r=\"5\"/> <path d=\"M30 33 L30 50\"/> <path d=\"M26 38 L34 38\"/> <path d=\"M26 44 L34 44\" stroke-dasharray=\"2 1.5\"/>", "NINE OF SWORDS": "<!-- 수평 검 9개 --> <path d=\"M8 14 L52 14 M8 18 L52 18 M8 22 L52 22 M8 26 L52 26 M8 30 L52 30 M8 34 L52 34 M8 38 L52 38 M8 42 L52 42 M8 46 L52 46\"/> <!-- 검 끝 --> <path d=\"M50 12 L52 14 L50 16\"/> <path d=\"M50 16 L52 18 L50 20\"/> <path d=\"M50 20 L52 22 L50 24\"/> <path d=\"M50 24 L52 26 L50 28\"/> <path d=\"M50 28 L52 30 L50 32\"/> <path d=\"M50 32 L52 34 L50 36\"/> <path d=\"M50 36 L52 38 L50 40\"/> <path d=\"M50 40 L52 42 L50 44\"/> <path d=\"M50 44 L52 46 L50 48\"/> <!-- 인물 (머리를 감싼) --> <circle cx=\"20\" cy=\"52\" r=\"4\"/> <path d=\"M16 50 L14 46 M24 50 L26 46\"/>", "TEN OF SWORDS": "<!-- 쓰러진 인물 --> <path d=\"M10 46 L50 46 L50 52 L10 52 Z\"/> <circle cx=\"14\" cy=\"49\" r=\"3\"/> <!-- 등에 꽂힌 검 10개 --> <path d=\"M18 20 L18 46 M22 18 L22 46 M26 16 L26 46 M30 14 L30 46 M34 16 L34 46\"/> <path d=\"M38 18 L38 46 M42 20 L42 46 M46 22 L46 46\"/> <!-- 점 2개 (나머지) --> <circle cx=\"14\" cy=\"30\" r=\"1.8\" class=\"f\"/> <circle cx=\"50\" cy=\"30\" r=\"1.8\" class=\"f\"/> <!-- 검 끝 --> <path d=\"M17 20 L18 18 L19 20\"/> <path d=\"M21 18 L22 16 L23 18\"/> <path d=\"M25 16 L26 14 L27 16\"/> <path d=\"M29 14 L30 12 L31 14\"/> <path d=\"M33 16 L34 14 L35 16\"/> <path d=\"M37 18 L38 16 L39 18\"/> <path d=\"M41 20 L42 18 L43 20\"/> <path d=\"M45 22 L46 20 L47 22\"/>", "PAGE OF SWORDS": "<!-- 검 (세로, 높이 들어올린) --> <path d=\"M36 8 L36 40\"/> <path d=\"M35 8 L36 6 L37 8\"/> <path d=\"M32 38 L40 38\"/> <!-- 인물 --> <circle cx=\"24\" cy=\"30\" r=\"5\"/> <path d=\"M24 35 L24 50 M20 44 L28 44\"/> <!-- 바람 암시 --> <path d=\"M10 20 Q16 16 22 20 Q16 24 10 20\"/> <path d=\"M10 28 Q14 24 18 28\"/>", "KNIGHT OF SWORDS": "<!-- 검 (대각선) --> <path d=\"M42 8 L18 40\"/> <path d=\"M41 8 L42 6 L44 8\"/> <path d=\"M16 38 L20 42\"/> <!-- 말 --> <path d=\"M10 44 Q16 36 26 38 Q34 40 40 34 L44 42 Q38 48 26 46 Z\"/> <path d=\"M10 44 L8 52 M16 46 L16 54\"/> <path d=\"M40 34 Q44 30 48 34\"/> <!-- 바람 선 --> <path d=\"M46 16 Q50 12 54 16 M46 22 Q50 18 54 22\"/>", "QUEEN OF SWORDS": "<!-- 검 (수직, 위로) --> <path d=\"M40 8 L40 36\"/> <path d=\"M39 8 L40 6 L41 8\"/> <path d=\"M36 34 L44 34\"/> <!-- 왕좌 --> <path d=\"M16 30 L16 54 L38 54 L38 30\"/> <path d=\"M16 30 L20 22 L24 26 L28 18 L32 22 L36 18 L38 30\"/> <!-- 구름 --> <path d=\"M8 20 Q12 16 16 20 Q20 16 24 20 Q28 16 32 20\"/> <!-- 인물 --> <circle cx=\"27\" cy=\"38\" r=\"4\"/>", "KING OF SWORDS": "<!-- 검 (대각선, 위로) --> <path d=\"M42 8 L28 30\"/> <path d=\"M41 8 L42 6 L44 8\"/> <path d=\"M26 28 L30 32\"/> <!-- 왕좌 --> <path d=\"M14 30 L14 54 L40 54 L40 30\"/> <path d=\"M14 30 L18 20 L22 26 L26 16 L30 22 L34 18 L38 24 L40 30\"/> <!-- 구름 장식 --> <path d=\"M42 28 Q46 24 50 28 Q46 32 42 28\"/> <path d=\"M44 36 Q48 32 52 36\"/> <!-- 인물 --> <circle cx=\"27\" cy=\"38\" r=\"4\"/> <path d=\"M27 42 L27 52\"/>", "ACE OF PENTACLES": "<!-- 큰 펜타클 --> <circle cx=\"30\" cy=\"28\" r=\"12\"/> <path d=\"M30 16 L33 24 L42 24 L35 30 L38 38 L30 33 L22 38 L25 30 L18 24 L27 24 Z\" class=\"f\"/> <!-- 구름 손 --> <path d=\"M20 44 Q30 40 40 44\"/> <path d=\"M24 50 Q30 46 36 50\"/> <!-- 꽃 --> <path d=\"M10 14 Q14 10 18 14 Q14 18 10 14\"/> <path d=\"M42 14 Q46 10 50 14 Q46 18 42 14\"/>", "TWO OF PENTACLES": "<!-- 무한대 리본 --> <path d=\"M20 24 Q14 18 14 24 Q14 30 20 30 Q26 30 30 24 Q34 18 40 18 Q46 18 46 24 Q46 30 40 30 Q34 30 30 36 Q26 42 20 42 Q14 42 14 36 Q14 30 20 30\"/> <!-- 두 펜타클 --> <circle cx=\"18\" cy=\"24\" r=\"5\"/> <path d=\"M18 19 L19.5 23 L24 23 L20.5 25.5 L22 30 L18 27.5 L14 30 L15.5 25.5 L12 23 L16.5 23 Z\" class=\"f\"/> <circle cx=\"42\" cy=\"36\" r=\"5\"/> <path d=\"M42 31 L43.5 35 L48 35 L44.5 37.5 L46 42 L42 39.5 L38 42 L39.5 37.5 L36 35 L40.5 35 Z\" class=\"f\"/> <!-- 파도 --> <path d=\"M10 52 Q20 48 30 52 Q40 48 50 52\"/>", "THREE OF PENTACLES": "<!-- 아치 건축 --> <path d=\"M14 54 L14 26 Q14 14 30 14 Q46 14 46 26 L46 54\"/> <path d=\"M20 54 L20 28 Q20 20 30 20 Q40 20 40 28 L40 54\"/> <!-- 세 펜타클 (아치 안) --> <circle cx=\"30\" cy=\"20\" r=\"4\"/> <path d=\"M30 16 L31 19 L34 19 L31.5 21 L32.5 24 L30 22.5 L27.5 24 L28.5 21 L26 19 L29 19 Z\" class=\"f\"/> <circle cx=\"18\" cy=\"36\" r=\"4\"/> <path d=\"M18 32 L19 35 L22 35 L19.5 37 L20.5 40 L18 38.5 L15.5 40 L16.5 37 L14 35 L17 35 Z\" class=\"f\"/> <circle cx=\"42\" cy=\"36\" r=\"4\"/> <path d=\"M42 32 L43 35 L46 35 L43.5 37 L44.5 40 L42 38.5 L39.5 40 L40.5 37 L38 35 L41 35 Z\" class=\"f\"/> <!-- 인물 --> <circle cx=\"30\" cy=\"46\" r=\"3\"/>", "FOUR OF PENTACLES": "<!-- 인물 --> <circle cx=\"30\" cy=\"22\" r=\"5\"/> <path d=\"M30 27 L30 44 M24 34 L36 34\"/> <!-- 머리 위 펜타클 --> <circle cx=\"30\" cy=\"12\" r=\"4\"/> <path d=\"M30 8 L31 11 L34 11 L31.5 13 L32.5 16 L30 14.5 L27.5 16 L28.5 13 L26 11 L29 11 Z\" class=\"f\"/> <!-- 품에 안은 펜타클 --> <circle cx=\"30\" cy=\"34\" r=\"4\"/> <path d=\"M30 30 L31 33 L34 33 L31.5 35 L32.5 38 L30 36.5 L27.5 38 L28.5 35 L26 33 L29 33 Z\" class=\"f\"/> <!-- 발 아래 두 펜타클 (점) --> <circle cx=\"20\" cy=\"50\" r=\"3\"/> <circle cx=\"40\" cy=\"50\" r=\"3\"/> <path d=\"M18 50 L20 48 L22 50 M38 50 L40 48 L42 50\"/>", "FIVE OF PENTACLES": "<!-- 교회 창문 --> <path d=\"M20 10 L20 40 L40 40 L40 10 Q30 4 20 10 Z\"/> <!-- 창문 안 펜타클 5개 --> <circle cx=\"30\" cy=\"16\" r=\"3\"/> <path d=\"M30 13 L31 15.5 L34 15.5 L31.5 17 L32.5 19.5 L30 18 L27.5 19.5 L28.5 17 L26 15.5 L29 15.5 Z\" class=\"f\"/> <circle cx=\"22\" cy=\"24\" r=\"2.5\"/> <circle cx=\"38\" cy=\"24\" r=\"2.5\"/> <circle cx=\"22\" cy=\"34\" r=\"2.5\"/> <circle cx=\"38\" cy=\"34\" r=\"2.5\"/> <!-- 두 인물 (바깥) --> <circle cx=\"14\" cy=\"48\" r=\"3\"/> <circle cx=\"24\" cy=\"50\" r=\"3\"/> <path d=\"M14 51 L14 58 M24 53 L24 58\"/> <!-- 눈 (위에서) --> <path d=\"M10 52 Q16 48 22 52 Q16 56 10 52\"/>", "SIX OF PENTACLES": "<!-- 저울 --> <path d=\"M30 12 L30 32\"/> <path d=\"M18 20 L42 20\"/> <path d=\"M18 20 L14 30 L22 30 Z\"/> <path d=\"M42 20 L38 30 L46 30 Z\"/> <path d=\"M26 32 L34 32 L32 36 L28 36 Z\"/> <!-- 여섯 펜타클 --> <circle cx=\"16\" cy=\"44\" r=\"3\"/> <path d=\"M16 41 L16.8 43.4 L19.4 43.4 L17.3 44.9 L18.1 47.3 L16 45.8 L13.9 47.3 L14.7 44.9 L12.6 43.4 L15.2 43.4 Z\" class=\"f\"/> <circle cx=\"26\" cy=\"46\" r=\"3\"/> <circle cx=\"36\" cy=\"46\" r=\"3\"/> <circle cx=\"46\" cy=\"44\" r=\"3\"/> <circle cx=\"22\" cy=\"54\" r=\"2.5\"/> <circle cx=\"38\" cy=\"54\" r=\"2.5\"/>", "SEVEN OF PENTACLES": "<!-- 덩굴/식물 --> <path d=\"M30 54 L30 38 Q28 30 22 26 Q28 24 32 18 Q36 24 40 22 Q36 30 32 38 L30 54\"/> <path d=\"M22 26 Q16 22 14 16\"/> <path d=\"M40 22 Q46 18 48 12\"/> <!-- 여섯 펜타클 (열매) --> <circle cx=\"22\" cy=\"26\" r=\"3\"/> <circle cx=\"32\" cy=\"18\" r=\"3\"/> <circle cx=\"40\" cy=\"22\" r=\"3\"/> <circle cx=\"14\" cy=\"16\" r=\"2.5\"/> <circle cx=\"48\" cy=\"12\" r=\"2.5\"/> <circle cx=\"30\" cy=\"38\" r=\"3\"/> <!-- 7번째 (점) --> <circle cx=\"30\" cy=\"10\" r=\"2\" class=\"f\"/> <!-- 인물 (바라봄) --> <circle cx=\"44\" cy=\"46\" r=\"4\"/> <path d=\"M40 46 L36 46\"/>", "EIGHT OF PENTACLES": "<!-- 기둥 (작업대) --> <path d=\"M24 10 L24 54\"/> <!-- 펜타클 8개 (기둥에 매달린) --> <circle cx=\"34\" cy=\"12\" r=\"4\"/> <path d=\"M34 8 L35 11 L38 11 L35.5 13 L36.5 16 L34 14.5 L31.5 16 L32.5 13 L30 11 L33 11 Z\" class=\"f\"/> <circle cx=\"34\" cy=\"22\" r=\"4\"/> <path d=\"M34 18 L35 21 L38 21 L35.5 23 L36.5 26 L34 24.5 L31.5 26 L32.5 23 L30 21 L33 21 Z\" class=\"f\"/> <circle cx=\"34\" cy=\"32\" r=\"4\"/> <path d=\"M34 28 L35 31 L38 31 L35.5 33 L36.5 36 L34 34.5 L31.5 36 L32.5 33 L30 31 L33 31 Z\" class=\"f\"/> <circle cx=\"34\" cy=\"42\" r=\"4\"/> <path d=\"M34 38 L35 41 L38 41 L35.5 43 L36.5 46 L34 44.5 L31.5 46 L32.5 43 L30 41 L33 41 Z\" class=\"f\"/> <!-- 점 4개 --> <circle cx=\"14\" cy=\"18\" r=\"2\" class=\"f\"/> <circle cx=\"14\" cy=\"28\" r=\"2\" class=\"f\"/> <circle cx=\"14\" cy=\"38\" r=\"2\" class=\"f\"/> <circle cx=\"14\" cy=\"48\" r=\"2\" class=\"f\"/> <!-- 인물 --> <circle cx=\"24\" cy=\"50\" r=\"3\"/>", "NINE OF PENTACLES": "<!-- 덩굴 --> <path d=\"M20 54 Q22 40 28 30 Q34 20 36 10\"/> <path d=\"M28 30 Q22 28 16 32 M28 30 Q34 28 40 24\"/> <!-- 펜타클 9개 --> <circle cx=\"28\" cy=\"12\" r=\"3\"/> <circle cx=\"36\" cy=\"16\" r=\"3\"/> <circle cx=\"40\" cy=\"24\" r=\"3\"/> <circle cx=\"36\" cy=\"32\" r=\"3\"/> <circle cx=\"28\" cy=\"30\" r=\"3\"/> <circle cx=\"20\" cy=\"28\" r=\"3\"/> <circle cx=\"16\" cy=\"32\" r=\"3\"/> <circle cx=\"20\" cy=\"40\" r=\"3\"/> <circle cx=\"28\" cy=\"42\" r=\"3\"/> <!-- 인물 --> <circle cx=\"44\" cy=\"44\" r=\"4\"/> <path d=\"M44 48 L44 56\"/> <!-- 새 (손목 위) --> <path d=\"M38 36 Q42 32 44 36 Q40 38 38 36\"/>", "TEN OF PENTACLES": "<!-- 펜타클 10개 (카발라 생명의 나무 배열) --> <circle cx=\"30\" cy=\"8\" r=\"3\"/> <circle cx=\"20\" cy=\"16\" r=\"3\"/> <circle cx=\"40\" cy=\"16\" r=\"3\"/> <circle cx=\"14\" cy=\"26\" r=\"3\"/> <circle cx=\"46\" cy=\"26\" r=\"3\"/> <circle cx=\"20\" cy=\"34\" r=\"3\"/> <circle cx=\"40\" cy=\"34\" r=\"3\"/> <circle cx=\"14\" cy=\"44\" r=\"3\"/> <circle cx=\"46\" cy=\"44\" r=\"3\"/> <circle cx=\"30\" cy=\"50\" r=\"3\"/> <!-- 연결선 (생명의 나무) --> <path d=\"M30 11 L20 13 M30 11 L40 13 M20 19 L14 23 M40 19 L46 23 M14 29 L20 31 M46 29 L40 31 M20 37 L14 41 M40 37 L46 41 M14 47 L30 47 M46 47 L30 47\" stroke-width=\"0.8\" opacity=\"0.5\"/> <!-- 가족 --> <circle cx=\"24\" cy=\"56\" r=\"2\"/> <circle cx=\"30\" cy=\"58\" r=\"2\"/> <circle cx=\"36\" cy=\"56\" r=\"2\"/>", "PAGE OF PENTACLES": "<!-- 큰 펜타클 (바라보는) --> <circle cx=\"34\" cy=\"24\" r=\"10\"/> <path d=\"M34 14 L36 21 L43 21 L37.5 25.5 L39.5 32.5 L34 28 L28.5 32.5 L30.5 25.5 L25 21 L32 21 Z\" class=\"f\"/> <!-- 인물 --> <circle cx=\"22\" cy=\"40\" r=\"5\"/> <path d=\"M22 45 L22 56 M18 50 L26 50\"/> <path d=\"M27 38 L32 30\"/>", "KNIGHT OF PENTACLES": "<!-- 펜타클 (손에 든) --> <circle cx=\"40\" cy=\"18\" r=\"7\"/> <path d=\"M40 11 L41.5 16 L47 16 L42.5 19.5 L44.5 25 L40 22 L35.5 25 L37.5 19.5 L33 16 L38.5 16 Z\" class=\"f\"/> <!-- 말 (느리게) --> <path d=\"M10 44 Q16 38 24 40 Q32 42 38 36 L40 42 Q34 48 22 46 Z\"/> <path d=\"M10 44 L8 52 M16 46 L16 54\"/> <path d=\"M38 36 Q42 34 44 38\"/> <!-- 땅 --> <path d=\"M8 54 Q30 50 52 54\"/>", "QUEEN OF PENTACLES": "<!-- 왕좌 --> <path d=\"M14 30 L14 54 L46 54 L46 30\"/> <path d=\"M14 30 L18 20 L22 26 L26 16 L30 12 L34 16 L38 26 L42 20 L46 30\"/> <!-- 펜타클 (무릎 위) --> <circle cx=\"30\" cy=\"38\" r=\"8\"/> <path d=\"M30 30 L32 36 L38 36 L33 40 L35 46 L30 42 L25 46 L27 40 L22 36 L28 36 Z\" class=\"f\"/> <!-- 꽃 장식 --> <circle cx=\"14\" cy=\"20\" r=\"3\"/> <path d=\"M11 20 L8 20 M17 20 L20 20 M14 17 L14 14 M14 23 L14 26\"/> <circle cx=\"46\" cy=\"20\" r=\"3\"/> <!-- 인물 --> <circle cx=\"30\" cy=\"26\" r=\"4\"/>", "KING OF PENTACLES": "<!-- 왕좌 (더 웅장하게) --> <path d=\"M12 28 L12 54 L48 54 L48 28\"/> <path d=\"M12 28 L16 18 L20 24 L24 14 L30 10 L36 14 L40 24 L44 18 L48 28\"/> <!-- 펜타클 (무릎 위, 크게) --> <circle cx=\"30\" cy=\"38\" r=\"9\"/> <path d=\"M30 29 L32.5 36 L40 36 L34 41 L36.5 48 L30 44 L23.5 48 L26 41 L20 36 L27.5 36 Z\" class=\"f\"/> <!-- 포도 덩굴 장식 --> <path d=\"M10 40 Q12 36 14 40 Q12 44 10 40\"/> <path d=\"M50 40 Q48 36 46 40 Q48 44 50 40\"/> <path d=\"M10 48 Q12 44 14 48 Q12 52 10 48\"/> <path d=\"M50 48 Q48 44 46 48 Q48 52 50 48\"/> <!-- 인물 --> <circle cx=\"30\" cy=\"24\" r=\"4\"/>", "RIDER": "<path d=\"M14 46 Q22 36 32 40 Q40 42 46 34 L48 42 Q42 48 30 46 Z\"/> <path d=\"M14 46 L12 54 M20 48 L20 56\"/> <circle cx=\"44\" cy=\"28\" r=\"4\"/> <path d=\"M44 32 L44 42 M40 38 L44 42 L48 38\"/> <path d=\"M46 34 Q50 30 52 34\"/>", "CLOVER": "<circle cx=\"30\" cy=\"22\" r=\"8\"/> <circle cx=\"20\" cy=\"34\" r=\"8\"/> <circle cx=\"40\" cy=\"34\" r=\"8\"/> <path d=\"M30 30 L30 50\"/> <path d=\"M24 48 Q30 44 36 48\"/>", "SHIP": "<path d=\"M16 38 Q30 32 44 38 L40 50 L20 50 Z\"/> <path d=\"M30 12 L30 38\"/> <path d=\"M30 12 L44 30 L30 30 Z\"/> <path d=\"M30 16 L18 30 L30 30 Z\"/> <path d=\"M10 52 Q30 48 50 52\"/>", "HOUSE": "<path d=\"M14 54 L14 30 L30 14 L46 30 L46 54 Z\"/> <path d=\"M14 30 L30 14 L46 30\"/> <path d=\"M24 54 L24 40 L36 40 L36 54\"/> <path d=\"M22 36 L28 36 L28 42 L22 42 Z\"/> <path d=\"M32 36 L38 36 L38 42 L32 42 Z\"/>", "TREE": "<path d=\"M30 54 L30 30\"/> <path d=\"M16 44 Q30 36 44 44\"/> <path d=\"M18 36 Q30 26 42 36\"/> <path d=\"M20 28 Q30 18 40 28\"/> <circle cx=\"30\" cy=\"14\" r=\"8\"/>", "CLOUDS": "<path d=\"M10 34 Q10 24 20 24 Q22 16 30 16 Q38 16 40 24 Q50 24 50 34 Q50 42 40 42 L20 42 Q10 42 10 34 Z\"/> <path d=\"M18 42 Q22 48 20 54 M30 42 L30 50 M42 42 Q38 48 40 54\"/>", "SNAKE": "<path d=\"M20 54 Q20 44 30 40 Q40 36 40 26 Q40 16 30 14 Q22 12 20 18\"/> <path d=\"M20 18 Q16 14 20 10 Q26 8 28 14\"/> <circle cx=\"22\" cy=\"12\" r=\"1.5\" class=\"f\"/> <circle cx=\"26\" cy=\"10\" r=\"1.5\" class=\"f\"/> <path d=\"M18 56 Q20 52 22 56\"/>", "COFFIN": "<path d=\"M20 16 L16 22 L16 50 L44 50 L44 22 L40 16 Z\"/> <path d=\"M20 16 L40 16\"/> <path d=\"M26 30 L34 30 M30 26 L30 34\"/> <path d=\"M16 22 L44 22\"/>", "BOUQUET": "<path d=\"M30 36 L30 54\"/> <path d=\"M24 50 Q30 46 36 50\"/> <circle cx=\"30\" cy=\"22\" r=\"5\"/> <circle cx=\"20\" cy=\"28\" r=\"5\"/> <circle cx=\"40\" cy=\"28\" r=\"5\"/> <circle cx=\"22\" cy=\"18\" r=\"4\"/> <circle cx=\"38\" cy=\"18\" r=\"4\"/> <path d=\"M18 36 Q24 32 30 36 Q36 32 42 36\"/>", "SCYTHE": "<path d=\"M22 54 L22 18\"/> <path d=\"M22 18 Q36 16 42 26 Q32 22 22 26\"/> <path d=\"M20 54 L24 54\"/>", "WHIP": "<path d=\"M30 14 L30 34 Q30 44 22 50\"/> <path d=\"M26 14 L26 30 Q26 40 18 46\"/> <path d=\"M34 14 L34 38 Q34 48 26 54\"/> <path d=\"M24 12 L36 12\"/>", "BIRDS": "<path d=\"M16 28 Q20 22 26 24 Q22 30 16 28\"/> <circle cx=\"22\" cy=\"24\" r=\"4\"/> <path d=\"M22 28 L22 40 M18 36 L26 36\"/> <path d=\"M34 24 Q40 18 46 22 Q40 28 34 24\"/> <circle cx=\"40\" cy=\"20\" r=\"4\"/> <path d=\"M40 24 L40 36 M36 32 L44 32\"/> <path d=\"M14 50 Q22 46 30 50 Q38 46 46 50\"/>", "CHILD": "<circle cx=\"30\" cy=\"20\" r=\"7\"/> <path d=\"M30 27 L30 46 M23 34 L37 34\"/> <path d=\"M23 34 L18 46 M37 34 L42 46\"/> <path d=\"M26 22 Q28 25 30 22 Q32 25 34 22\"/> <path d=\"M20 50 Q30 46 40 50\"/>", "FOX": "<path d=\"M20 14 L14 8 L20 20 Z\"/> <path d=\"M40 14 L46 8 L40 20 Z\"/> <path d=\"M20 20 Q20 12 30 12 Q40 12 40 20 L38 32 Q30 38 22 32 Z\"/> <circle cx=\"24\" cy=\"22\" r=\"2\" class=\"f\"/> <circle cx=\"36\" cy=\"22\" r=\"2\" class=\"f\"/> <path d=\"M26 30 Q30 33 34 30\"/> <path d=\"M22 32 L16 44 Q30 40 44 44 L38 32\"/> <path d=\"M14 52 Q30 46 46 52\"/>", "BEAR": "<circle cx=\"22\" cy=\"18\" r=\"5\"/> <circle cx=\"38\" cy=\"18\" r=\"5\"/> <path d=\"M16 22 Q16 14 30 14 Q44 14 44 22 L42 40 Q30 46 18 40 Z\"/> <circle cx=\"24\" cy=\"26\" r=\"2.5\" class=\"f\"/> <circle cx=\"36\" cy=\"26\" r=\"2.5\" class=\"f\"/> <circle cx=\"30\" cy=\"30\" r=\"3\"/> <path d=\"M27 35 Q30 38 33 35\"/> <path d=\"M20 40 L18 52 M40 40 L42 52\"/> <path d=\"M18 52 Q30 48 42 52\"/>", "STAR": "<path d=\"M30 10 L34 22 L46 22 L37 30 L40 42 L30 35 L20 42 L23 30 L14 22 L26 22 Z\" class=\"f\"/> <circle cx=\"14\" cy=\"48\" r=\"2\" class=\"f\"/> <circle cx=\"24\" cy=\"52\" r=\"1.5\" class=\"f\"/> <circle cx=\"46\" cy=\"46\" r=\"2\" class=\"f\"/> <circle cx=\"50\" cy=\"16\" r=\"1.5\" class=\"f\"/> <circle cx=\"10\" cy=\"20\" r=\"1.5\" class=\"f\"/>", "STORK": "<circle cx=\"30\" cy=\"14\" r=\"5\"/> <path d=\"M30 19 L30 36\"/> <path d=\"M30 36 L22 50 M30 36 L38 50\"/> <path d=\"M26 50 L22 54 M34 50 L38 54\"/> <path d=\"M30 14 L38 10\"/> <path d=\"M24 22 Q18 20 16 24\"/>", "DOG": "<path d=\"M18 24 L14 16 L20 20 Z\"/> <path d=\"M18 24 Q18 16 28 16 Q38 16 38 24 L36 34 Q28 40 20 34 Z\"/> <circle cx=\"22\" cy=\"24\" r=\"2\" class=\"f\"/> <circle cx=\"34\" cy=\"24\" r=\"2\" class=\"f\"/> <path d=\"M25 32 Q28 35 31 32\"/> <path d=\"M20 34 L16 46 M36 34 L40 46\"/> <path d=\"M40 20 L46 16 L44 24 Z\"/> <path d=\"M38 44 Q44 40 46 46\"/>", "TOWER": "<path d=\"M22 54 L22 20 L38 20 L38 54\"/> <path d=\"M20 20 L24 12 L30 10 L36 12 L40 20\"/> <path d=\"M20 20 L40 20\"/> <path d=\"M26 34 L34 34 L34 42 L26 42 Z\"/> <path d=\"M30 10 L30 6\"/> <path d=\"M18 54 L42 54\"/> <path d=\"M22 28 L38 28\"/>", "GARDEN": "<path d=\"M10 50 L10 30 L50 30 L50 50 Z\"/> <path d=\"M10 30 L10 28 L50 28 L50 30\"/> <circle cx=\"20\" cy=\"20\" r=\"6\"/> <path d=\"M20 26 L20 28\"/> <circle cx=\"40\" cy=\"20\" r=\"6\"/> <path d=\"M40 26 L40 28\"/> <path d=\"M22 40 L38 40 L38 50 L22 50 Z\"/> <path d=\"M26 40 L26 50 M34 40 L34 50\"/> <path d=\"M10 42 L22 42 M38 42 L50 42\"/>", "MOUNTAIN": "<path d=\"M8 54 L22 28 L36 54 Z\"/> <path d=\"M20 54 L36 22 L52 54 Z\"/> <path d=\"M22 28 L28 18 L34 28\"/> <path d=\"M8 54 L52 54\"/>", "CROSSROADS": "<path d=\"M30 54 L30 32\"/> <path d=\"M30 32 L14 16\"/> <path d=\"M30 32 L46 16\"/> <path d=\"M26 54 L34 54\"/> <path d=\"M16 18 L12 14 M44 18 L48 14\"/> <path d=\"M20 40 Q30 36 40 40\"/>", "MICE": "<path d=\"M18 36 Q14 28 18 22 Q24 16 30 20 Q38 14 42 22 Q46 30 40 36 L36 44 L24 44 Z\"/> <circle cx=\"22\" cy=\"26\" r=\"2\" class=\"f\"/> <circle cx=\"38\" cy=\"26\" r=\"2\" class=\"f\"/> <path d=\"M26 36 Q30 39 34 36\"/> <path d=\"M18 22 L14 16 M42 22 L46 16\"/> <path d=\"M24 44 L20 54 M36 44 L40 54\"/> <path d=\"M40 48 Q44 52 48 50\"/>", "HEART": "<path d=\"M30 48 Q12 36 12 24 Q12 14 22 14 Q28 14 30 20 Q32 14 38 14 Q48 14 48 24 Q48 36 30 48 Z\"/>", "RING": "<circle cx=\"30\" cy=\"28\" r=\"14\"/> <circle cx=\"30\" cy=\"28\" r=\"8\"/> <path d=\"M26 16 Q30 12 34 16\"/> <circle cx=\"30\" cy=\"14\" r=\"3\"/>", "BOOK": "<path d=\"M16 14 L16 50 L44 50 L44 14 Z\"/> <path d=\"M30 14 L30 50\"/> <path d=\"M16 14 Q30 10 44 14\"/> <path d=\"M19 24 L27 24 M19 30 L27 30 M19 36 L27 36 M19 42 L27 42\"/> <path d=\"M33 24 L41 24 M33 30 L41 30 M33 36 L41 36\"/> <path d=\"M33 42 L38 42\"/>", "LETTER": "<path d=\"M12 18 L12 46 L48 46 L48 18 Z\"/> <path d=\"M12 18 L30 34 L48 18\"/> <path d=\"M12 46 L24 32 M48 46 L36 32\"/> <path d=\"M20 24 L28 24 M20 30 L32 30\"/>", "GENTLEMAN": "<circle cx=\"30\" cy=\"18\" r=\"8\"/> <path d=\"M30 26 L30 46 M22 32 L38 32\"/> <path d=\"M22 32 L16 50 M38 32 L44 50\"/> <path d=\"M20 22 Q18 18 20 16 M40 22 Q42 18 40 16\"/> <path d=\"M16 50 Q30 46 44 50\"/>", "LADY": "<circle cx=\"30\" cy=\"16\" r=\"8\"/> <path d=\"M22 24 Q20 30 24 44 Q28 50 30 50 Q32 50 36 44 Q40 30 38 24 Z\"/> <path d=\"M22 24 L14 38 M38 24 L46 38\"/> <path d=\"M20 16 Q18 10 22 10 M40 16 Q42 10 38 10\"/>", "LILY": "<path d=\"M30 54 L30 34\"/> <path d=\"M30 34 Q22 28 20 18 Q28 24 30 34\"/> <path d=\"M30 34 Q38 28 40 18 Q32 24 30 34\"/> <path d=\"M30 26 Q24 18 24 10 Q30 18 30 26\"/> <path d=\"M30 26 Q36 18 36 10 Q30 18 30 26\"/> <path d=\"M30 20 L30 14\"/> <path d=\"M26 54 Q30 50 34 54\"/>", "SUN": "<circle cx=\"30\" cy=\"30\" r=\"12\"/> <path d=\"M30 8 L30 14 M30 46 L30 52 M8 30 L14 30 M46 30 L52 30 M14 14 L18 18 M42 42 L46 46 M46 14 L42 18 M14 46 L18 42\"/> <circle cx=\"26\" cy=\"27\" r=\"1.5\" class=\"f\"/> <circle cx=\"34\" cy=\"27\" r=\"1.5\" class=\"f\"/> <path d=\"M26 33 Q30 36 34 33\"/>", "MOON": "<path d=\"M38 12 Q24 16 24 30 Q24 44 38 48 Q28 42 28 30 Q28 18 38 12 Z\" class=\"f\"/> <circle cx=\"14\" cy=\"22\" r=\"2\" class=\"f\"/> <circle cx=\"46\" cy=\"18\" r=\"2\" class=\"f\"/> <circle cx=\"48\" cy=\"36\" r=\"1.5\" class=\"f\"/> <circle cx=\"12\" cy=\"40\" r=\"1.5\" class=\"f\"/> <path d=\"M10 52 Q30 48 50 52\"/>", "KEY": "<circle cx=\"24\" cy=\"24\" r=\"10\"/> <circle cx=\"24\" cy=\"24\" r=\"5\"/> <path d=\"M30 30 L46 46\"/> <path d=\"M40 42 L44 38 M44 46 L48 42\"/>", "FISH": "<path d=\"M16 30 Q28 20 42 28 Q28 36 16 30 Z\"/> <path d=\"M16 30 L10 24 M16 30 L10 36\"/> <circle cx=\"36\" cy=\"27\" r=\"2\" class=\"f\"/> <path d=\"M10 44 Q22 40 34 44 Q22 48 10 44\"/> <path d=\"M10 44 L6 40 M10 44 L6 48\"/> <circle cx=\"28\" cy=\"43\" r=\"1.5\" class=\"f\"/>", "ANCHOR": "<circle cx=\"30\" cy=\"16\" r=\"5\"/> <path d=\"M30 21 L30 50\"/> <path d=\"M18 28 L42 28\"/> <path d=\"M16 50 Q20 42 30 50 Q40 42 44 50\"/> <path d=\"M26 14 Q30 10 34 14\"/>", "CROSS": "<path d=\"M30 10 L30 54\"/> <path d=\"M14 26 L46 26\"/> <path d=\"M28 8 L30 6 L32 8\"/> <path d=\"M28 54 L32 54\"/>", "운명": "<circle cx=\"30\" cy=\"30\" r=\"16\"/> <path d=\"M30 14 L30 30 L40 36\"/> <path d=\"M30 6 L32 12 L30 11 L28 12 Z\" class=\"f\"/> <circle cx=\"30\" cy=\"30\" r=\"2\" class=\"f\"/>", "남성별": "<circle cx=\"30\" cy=\"28\" r=\"11\"/> <path d=\"M30 8 L30 13 M30 43 L30 48 M8 28 L13 28 M47 28 L52 28 M14 14 L18 18 M42 38 L46 42 M46 14 L42 18 M14 42 L18 38\"/> <path d=\"M26 25 L30 22 L34 25 M26 31 L30 34 L34 31\"/>", "여성별": "<path d=\"M36 12 Q22 16 22 30 Q22 44 36 48 Q26 42 26 30 Q26 18 36 12 Z\" class=\"f\"/> <path d=\"M26 26 Q30 22 34 26 M26 34 Q30 38 34 34\"/>", "탄생": "<path d=\"M20 46 Q20 34 30 30 Q40 34 40 46\"/> <circle cx=\"30\" cy=\"24\" r=\"8\"/> <path d=\"M26 22 Q28 26 30 22 Q32 26 34 22\"/> <path d=\"M30 14 L30 10 M24 16 L20 12 M36 16 L40 12\"/>", "성공": "<path d=\"M30 10 L34 22 L46 22 L37 30 L40 42 L30 35 L20 42 L23 30 L14 22 L26 22 Z\" class=\"f\"/> <path d=\"M22 50 L30 46 L38 50\"/> <path d=\"M26 54 L30 50 L34 54\"/>", "고양": "<path d=\"M30 10 L30 50\"/> <path d=\"M22 18 L30 10 L38 18\"/> <path d=\"M22 26 L30 18 L38 26\"/> <path d=\"M18 50 L42 50\"/> <path d=\"M22 46 L30 42 L38 46\"/>", "명예": "<path d=\"M20 14 L20 36 Q20 46 30 50 Q40 46 40 36 L40 14 Z\"/> <path d=\"M20 14 L40 14\"/> <path d=\"M24 22 L36 22 M24 28 L36 28 M24 34 L36 34\"/> <path d=\"M26 50 Q30 54 34 50\"/>", "사고·우정": "<circle cx=\"30\" cy=\"20\" r=\"8\"/> <path d=\"M27 17 Q30 13 33 17 Q30 21 30 24\"/> <circle cx=\"30\" cy=\"27\" r=\"1.5\" class=\"f\"/> <path d=\"M18 44 Q24 40 30 44 Q36 40 42 44\"/> <path d=\"M18 44 L18 52 M42 44 L42 52\"/> <path d=\"M18 52 Q30 48 42 52\"/>", "시골·건강": "<circle cx=\"30\" cy=\"18\" r=\"8\"/> <path d=\"M22 16 L18 12 M26 14 L26 8 M34 14 L34 8 M38 16 L42 12\"/> <path d=\"M8 42 Q18 34 28 38 Q38 34 52 42\"/> <path d=\"M14 42 Q18 36 22 40 Q26 36 30 40 Q34 36 38 40\"/> <path d=\"M8 52 Q30 46 52 52\"/>", "선물": "<path d=\"M14 30 L14 52 L46 52 L46 30 Z\"/> <path d=\"M12 24 L12 30 L48 30 L48 24 Z\"/> <path d=\"M30 24 L30 52\"/> <path d=\"M30 24 Q24 18 20 22 Q18 26 24 28 Q30 26 30 24\"/> <path d=\"M30 24 Q36 18 40 22 Q42 26 36 28 Q30 26 30 24\"/> <path d=\"M18 40 L28 40 M32 40 L42 40\"/>", "배신": "<circle cx=\"24\" cy=\"24\" r=\"6\"/> <circle cx=\"38\" cy=\"30\" r=\"6\"/> <path d=\"M28 26 Q32 20 36 26\"/> <path d=\"M20 30 L16 44\"/> <path d=\"M42 36 L46 50\"/> <path d=\"M16 44 Q30 40 46 50\" stroke-dasharray=\"2 2\"/>", "출발": "<circle cx=\"22\" cy=\"28\" r=\"6\"/> <path d=\"M28 28 L50 28\"/> <path d=\"M44 22 L50 28 L44 34\"/> <path d=\"M16 50 Q30 44 44 50\"/> <path d=\"M22 34 L22 50\"/>", "변덕": "<path d=\"M16 20 Q20 12 28 16 Q24 24 16 20\"/> <path d=\"M44 20 Q40 12 32 16 Q36 24 44 20\"/> <path d=\"M28 16 Q30 28 32 16\"/> <path d=\"M16 40 Q22 32 30 36 Q38 32 44 40\"/> <path d=\"M16 48 Q22 40 30 44 Q38 40 44 48\"/>", "발견": "<circle cx=\"26\" cy=\"26\" r=\"12\"/> <circle cx=\"26\" cy=\"26\" r=\"6\"/> <path d=\"M34 34 L46 46\"/> <path d=\"M44 42 L48 38 L50 46 Z\" class=\"f\"/> <path d=\"M20 26 L32 26 M26 20 L26 32\"/>", "물": "<path d=\"M30 10 Q36 22 36 30 Q36 42 30 46 Q24 42 24 30 Q24 22 30 10 Z\"/> <path d=\"M10 48 Q20 44 30 48 Q40 44 50 48\"/> <path d=\"M14 54 Q22 50 30 54 Q38 50 46 54\"/>", "가정": "<path d=\"M12 54 L12 28 L30 12 L48 28 L48 54 Z\"/> <path d=\"M12 28 L30 12 L48 28\"/> <path d=\"M22 54 L22 40 L38 40 L38 54\"/> <path d=\"M20 34 L26 34 L26 40 L20 40 Z\"/> <path d=\"M34 34 L40 34 L40 40 L34 40 Z\"/> <path d=\"M29 12 L30 8 L31 12\"/>", "질병": "<path d=\"M26 16 L34 16 L34 24 L42 24 L42 32 L34 32 L34 40 L26 40 L26 32 L18 32 L18 24 L26 24 Z\"/> <circle cx=\"30\" cy=\"50\" r=\"4\"/> <path d=\"M26 46 L22 42 M34 46 L38 42\"/>", "변화": "<path d=\"M14 22 Q22 14 32 18 Q38 20 40 28\"/> <path d=\"M36 18 L40 28 L30 26 Z\" class=\"f\"/> <path d=\"M46 38 Q38 46 28 42 Q22 40 20 32\"/> <path d=\"M24 42 L20 32 L30 34 Z\" class=\"f\"/> <circle cx=\"30\" cy=\"30\" r=\"3\" class=\"f\"/>", "돈": "<circle cx=\"30\" cy=\"28\" r=\"14\"/> <circle cx=\"30\" cy=\"28\" r=\"9\"/> <path d=\"M30 14 L30 18 M30 38 L30 42\"/> <path d=\"M27 22 Q30 20 33 22 Q30 24 27 22\"/> <path d=\"M27 34 Q30 36 33 34 Q30 32 27 34\"/> <path d=\"M24 28 L36 28\"/>", "지성": "<path d=\"M20 36 Q16 28 20 20 Q24 12 30 12 Q36 12 40 20 Q44 28 40 36 L38 42 L22 42 Z\"/> <path d=\"M22 42 L22 48 L38 48 L38 42\"/> <path d=\"M26 48 L26 52 L34 52 L34 48\"/> <path d=\"M24 24 Q30 20 36 24 M24 30 Q30 26 36 30\"/> <path d=\"M30 10 L30 6\"/>", "도난·손실": "<path d=\"M30 10 Q36 22 36 30 Q36 38 30 44 Q24 38 24 30 Q24 22 30 10 Z\" stroke-dasharray=\"3 2\"/> <path d=\"M22 28 L38 28\"/> <path d=\"M26 38 L34 22\"/> <path d=\"M14 50 Q22 46 30 50 Q38 46 46 50\" stroke-dasharray=\"2 2\"/>", "사업": "<path d=\"M14 46 L14 28 L46 28 L46 46 Z\"/> <path d=\"M22 28 L22 22 L38 22 L38 28\"/> <path d=\"M26 22 L26 18 L34 18 L34 22\"/> <path d=\"M14 36 L46 36\"/> <path d=\"M24 36 L24 46 M36 36 L36 46\"/>", "교류": "<path d=\"M14 22 Q22 14 30 18 Q38 14 46 22\"/> <path d=\"M14 22 Q22 30 30 26 Q38 30 46 22\"/> <path d=\"M14 38 Q22 30 30 34 Q38 30 46 38\"/> <path d=\"M14 38 Q22 46 30 42 Q38 46 46 38\"/> <circle cx=\"30\" cy=\"30\" r=\"3\" class=\"f\"/>", "소식": "<path d=\"M12 18 L12 46 L48 46 L48 18 Z\"/> <path d=\"M12 18 L30 32 L48 18\"/> <path d=\"M12 46 L24 34 M48 46 L36 34\"/> <path d=\"M30 28 L32 24 L30 26 L28 24 Z\" class=\"f\"/>", "즐거움": "<circle cx=\"30\" cy=\"28\" r=\"14\"/> <circle cx=\"24\" cy=\"24\" r=\"2\" class=\"f\"/> <circle cx=\"36\" cy=\"24\" r=\"2\" class=\"f\"/> <path d=\"M22 34 Q26 40 30 38 Q34 40 38 34\"/> <path d=\"M14 48 Q22 44 30 48 Q38 44 46 48\"/>", "평화": "<circle cx=\"30\" cy=\"24\" r=\"12\"/> <path d=\"M30 36 L30 54\"/> <path d=\"M20 44 L40 44\"/> <path d=\"M22 50 L38 50\"/> <path d=\"M24 18 L36 30 M36 18 L24 30\"/>", "결합": "<circle cx=\"22\" cy=\"26\" r=\"9\"/> <circle cx=\"22\" cy=\"26\" r=\"5\"/> <circle cx=\"38\" cy=\"26\" r=\"9\"/> <circle cx=\"38\" cy=\"26\" r=\"5\"/> <path d=\"M22 35 Q30 40 38 35\"/> <path d=\"M18 46 Q22 42 26 46 Q30 42 34 46 Q38 42 42 46\"/>", "가족": "<circle cx=\"20\" cy=\"18\" r=\"5\"/> <circle cx=\"40\" cy=\"18\" r=\"5\"/> <circle cx=\"30\" cy=\"36\" r=\"4\"/> <path d=\"M20 23 L20 38 M40 23 L40 38\"/> <path d=\"M20 32 Q30 28 40 32\"/> <path d=\"M16 52 L20 40 M24 52 L20 40\"/> <path d=\"M36 52 L40 40 M44 52 L40 40\"/> <path d=\"M28 50 L30 42 M32 50 L30 42\"/>", "사랑": "<path d=\"M30 50 Q10 36 10 22 Q10 12 20 12 Q26 12 30 18 Q34 12 40 12 Q50 12 50 22 Q50 36 30 50 Z\"/> <path d=\"M22 20 Q26 16 30 20 Q34 16 38 20\" stroke-width=\"1\"/>", "식탁": "<path d=\"M8 36 L52 36 L52 42 L8 42 Z\"/> <path d=\"M16 42 L16 54 M44 42 L44 54\"/> <path d=\"M20 28 L20 36 M30 24 L30 36 M40 28 L40 36\"/> <circle cx=\"20\" cy=\"26\" r=\"2\"/> <circle cx=\"30\" cy=\"22\" r=\"2\"/> <circle cx=\"40\" cy=\"26\" r=\"2\"/> <path d=\"M36 28 L36 36 M38 28 L38 36\"/>", "열정": "<path d=\"M30 10 Q36 18 34 26 Q40 18 38 28 Q44 20 40 34 Q44 40 36 44 Q38 36 30 38 Q22 36 24 44 Q16 40 20 34 Q16 20 22 28 Q20 18 26 26 Q24 18 30 10 Z\"/> <path d=\"M30 46 Q12 34 12 22 Q12 14 20 14 Q26 14 30 18 Q34 14 40 14 Q48 14 48 22 Q48 34 30 46 Z\" stroke-width=\"1\" opacity=\"0.5\"/>", "악의": "<path d=\"M30 8 L34 20 L46 20 L36 28 L40 40 L30 32 L20 40 L24 28 L14 20 L26 20 Z\"/> <path d=\"M24 24 L36 32 M36 24 L24 32\"/>", "소송": "<path d=\"M30 12 L30 48\"/> <path d=\"M18 22 L42 22\"/> <path d=\"M18 22 L14 34 L22 34 Z\"/> <path d=\"M42 22 L38 34 L46 34 Z\"/> <path d=\"M26 48 L34 48 L32 54 L28 54 Z\"/> <circle cx=\"30\" cy=\"12\" r=\"2\"/> <path d=\"M14 56 L46 56\"/>", "독재": "<path d=\"M18 22 L18 14 L22 18 L26 12 L30 10 L34 12 L38 18 L42 14 L42 22 Z\"/> <path d=\"M18 22 L42 22\"/> <path d=\"M24 32 L24 26 L36 26 L36 32 Q36 40 30 42 Q24 40 24 32 Z\"/> <path d=\"M20 32 L24 32 M36 32 L40 32\"/> <path d=\"M27 48 L30 44 L33 48\"/>", "적": "<circle cx=\"15\" cy=\"22\" r=\"5\"/> <circle cx=\"45\" cy=\"22\" r=\"5\"/> <path d=\"M15 27 L15 44 M45 27 L45 44\"/> <path d=\"M15 36 L25 40 M45 36 L35 40\"/> <path d=\"M28 38 L32 44 M32 38 L28 44\"/> <path d=\"M14 52 Q30 46 46 52\"/>", "협상": "<path d=\"M6 20 Q6 12 14 12 L32 12 Q40 12 40 20 Q40 28 32 28 L26 28 L20 34 L22 28 L14 28 Q6 28 6 20 Z\"/> <path d=\"M20 40 Q20 34 28 34 L46 34 Q54 34 54 40 Q54 46 46 46 L40 46 L44 52 L38 46 L28 46 Q20 46 20 40 Z\"/> <circle cx=\"20\" cy=\"20\" r=\"1.5\" class=\"f\"/> <circle cx=\"28\" cy=\"20\" r=\"1.5\" class=\"f\"/> <circle cx=\"36\" cy=\"40\" r=\"1.5\" class=\"f\"/> <circle cx=\"44\" cy=\"40\" r=\"1.5\" class=\"f\"/>", "불": "<path d=\"M30 8 Q36 16 34 24 Q40 16 38 28 Q44 20 40 34 Q44 40 36 46 Q38 38 30 40 Q22 38 24 46 Q16 40 20 34 Q16 20 22 28 Q20 16 26 24 Q24 16 30 8 Z\"/> <circle cx=\"30\" cy=\"36\" r=\"5\" class=\"f\"/>", "사고": "<path d=\"M30 10 L22 28 L10 28 L20 38 L16 52 L30 44 L44 52 L40 38 L50 28 L38 28 Z\"/> <circle cx=\"30\" cy=\"30\" r=\"3\" class=\"f\"/>", "지지": "<path d=\"M18 36 L18 52 L42 52 L42 36\"/> <path d=\"M14 36 L46 36\"/> <circle cx=\"22\" cy=\"24\" r=\"5\"/> <circle cx=\"38\" cy=\"24\" r=\"5\"/> <path d=\"M22 29 L22 36 M38 29 L38 36\"/> <path d=\"M22 32 Q30 28 38 32\"/>", "미모": "<circle cx=\"30\" cy=\"22\" r=\"12\"/> <path d=\"M24 20 Q26 16 30 18 Q34 16 36 20\"/> <circle cx=\"25\" cy=\"22\" r=\"1.5\" class=\"f\"/> <circle cx=\"35\" cy=\"22\" r=\"1.5\" class=\"f\"/> <path d=\"M26 26 Q30 30 34 26\"/> <path d=\"M26 34 L34 34\"/> <path d=\"M30 34 L30 42\"/> <path d=\"M22 42 L38 42 L36 52 L24 52 Z\"/>", "유산": "<path d=\"M14 54 L14 28 L30 12 L46 28 L46 54 Z\"/> <path d=\"M22 54 L22 40 L38 40 L38 54\"/> <circle cx=\"44\" cy=\"14\" r=\"5\"/> <circle cx=\"44\" cy=\"14\" r=\"2.5\"/> <path d=\"M48 18 L54 24\"/> <path d=\"M52 22 L54 24 L52 26\"/>", "지혜": "<path d=\"M20 48 Q16 38 18 28 Q20 16 30 14 Q40 16 42 28 Q44 38 40 48 Z\"/> <circle cx=\"24\" cy=\"28\" r=\"5\"/> <circle cx=\"36\" cy=\"28\" r=\"5\"/> <circle cx=\"24\" cy=\"28\" r=\"2.5\" class=\"f\"/> <circle cx=\"36\" cy=\"28\" r=\"2.5\" class=\"f\"/> <path d=\"M27 34 Q30 36 33 34\"/> <path d=\"M28 14 L24 8 M32 14 L36 8\"/> <path d=\"M18 48 Q22 44 26 48 Q30 44 34 48 Q38 44 42 48\"/>", "명성": "<path d=\"M30 12 L33 22 L44 22 L35 28 L38 38 L30 32 L22 38 L25 28 L16 22 L27 22 Z\" class=\"f\"/> <path d=\"M18 46 Q22 40 26 44 Q30 40 34 44 Q38 40 42 46\"/> <path d=\"M14 50 Q22 44 30 48 Q38 44 46 50\"/> <circle cx=\"12\" cy=\"20\" r=\"2\" class=\"f\"/> <circle cx=\"48\" cy=\"20\" r=\"2\" class=\"f\"/>", "우연": "<path d=\"M16 20 L14 36 L28 46 L44 40 L46 24 L32 14 Z\"/> <path d=\"M16 20 L32 14 L46 24\"/> <path d=\"M16 20 L14 36 L28 46\"/> <path d=\"M46 24 L44 40 L28 46\"/> <circle cx=\"24\" cy=\"26\" r=\"2\" class=\"f\"/> <circle cx=\"36\" cy=\"30\" r=\"2\" class=\"f\"/> <circle cx=\"28\" cy=\"36\" r=\"2\" class=\"f\"/> <circle cx=\"36\" cy=\"22\" r=\"1.5\" class=\"f\"/> <circle cx=\"30\" cy=\"22\" r=\"1.5\" class=\"f\"/>", "행복": "<circle cx=\"30\" cy=\"26\" r=\"12\"/> <path d=\"M30 6 L30 10 M30 42 L30 46 M10 26 L14 26 M46 26 L50 26 M16 12 L19 15 M41 37 L44 40 M44 12 L41 15 M19 37 L16 40\"/> <circle cx=\"25\" cy=\"22\" r=\"2\" class=\"f\"/> <circle cx=\"35\" cy=\"22\" r=\"2\" class=\"f\"/> <path d=\"M24 30 Q30 36 36 30\"/>", "불행": "<path d=\"M10 26 Q10 16 20 16 Q22 10 30 10 Q38 10 40 16 Q50 16 50 26 Q50 34 40 34 L20 34 Q10 34 10 26 Z\"/> <path d=\"M28 34 L22 44 L30 42 L24 54\"/> <path d=\"M36 34 L32 44\"/>", "불모": "<path d=\"M30 54 L30 28\"/> <path d=\"M30 40 L20 32 M30 40 L40 32\"/> <path d=\"M30 32 L18 24 M30 32 L42 24\"/> <path d=\"M30 28 L22 18 M30 28 L38 18\"/> <path d=\"M30 24 L26 14 M30 24 L34 14\"/> <path d=\"M20 54 Q30 50 40 54\"/>", "숙명": "<circle cx=\"30\" cy=\"28\" r=\"14\"/> <circle cx=\"30\" cy=\"28\" r=\"6\"/> <path d=\"M30 14 L30 22 M30 34 L30 42 M16 28 L24 28 M36 28 L44 28 M20 18 L25 23 M35 33 L40 38 M40 18 L35 23 M25 33 L20 38\"/> <path d=\"M22 46 Q26 42 30 46 Q34 42 38 46 Q40 50 36 52 Q32 54 28 52 Q24 50 22 46 Z\"/>", "은총": "<path d=\"M30 22 Q22 16 16 20 Q10 24 14 32 Q18 38 30 34 Q42 38 46 32 Q50 24 44 20 Q38 16 30 22 Z\"/> <path d=\"M18 28 Q14 22 18 18 Q22 14 26 20\"/> <path d=\"M42 28 Q46 22 42 18 Q38 14 34 20\"/> <circle cx=\"30\" cy=\"22\" r=\"4\"/> <path d=\"M30 26 L30 42\"/> <path d=\"M26 38 L30 42 L34 38\"/>", "파멸": "<path d=\"M18 16 L18 44\" opacity=\"0.5\"/> <path d=\"M24 10 L26 44\"/> <path d=\"M34 10 L36 44\"/> <path d=\"M42 16 L42 44\" opacity=\"0.5\"/> <path d=\"M14 44 L46 44\"/> <path d=\"M12 50 Q30 46 48 50\" stroke-dasharray=\"3 2\"/> <path d=\"M20 10 Q30 6 40 10\" stroke-dasharray=\"2 2\"/>", "지연": "<circle cx=\"30\" cy=\"28\" r=\"16\"/> <circle cx=\"30\" cy=\"28\" r=\"2\" class=\"f\"/> <path d=\"M30 12 L30 28 L40 28\"/> <path d=\"M16 48 L20 44 M44 48 L40 44\"/> <path d=\"M14 54 Q30 50 46 54\"/> <path d=\"M28 10 L32 10 M26 12 L34 12\" stroke-width=\"2\"/>", "수도원": "<path d=\"M12 54 L12 26 L30 10 L48 26 L48 54 Z\"/> <path d=\"M20 54 L20 36 L40 36 L40 54\"/> <path d=\"M28 12 L30 6 L32 12 L30 12 Z\"/> <path d=\"M30 6 L30 12\"/> <path d=\"M16 36 L18 36 M42 36 L44 36 M16 42 L18 42 M42 42 L44 42 M16 48 L18 48 M42 48 L44 48\"/> <path d=\"M28 36 L32 36\"/>"};
+  const CARD_MAP = {"0.바보": "THE FOOL", "1.마법사": "THE MAGICIAN", "2.고위여사제": "THE HIGH PRIESTESS", "3.여황제": "THE EMPRESS", "4.황제": "THE EMPEROR", "5.교황": "THE HIEROPHANT", "6.연인": "THE LOVERS", "7.전차": "THE CHARIOT", "8.힘": "STRENGTH", "9.은둔자": "THE HERMIT", "10.운명수레": "WHEEL OF FORTUNE", "11.정의": "JUSTICE", "12.매달린": "THE HANGED MAN", "13.죽음": "DEATH", "14.절제": "TEMPERANCE", "15.악마": "THE DEVIL", "16.탑": "THE TOWER", "17.별": "THE STAR", "18.달": "THE MOON", "19.태양": "THE SUN", "20.심판": "JUDGEMENT", "21.세계": "THE WORLD", "완드A": "ACE OF WANDS", "완드2": "TWO OF WANDS", "완드3": "THREE OF WANDS", "완드4": "FOUR OF WANDS", "완드5": "FIVE OF WANDS", "완드6": "SIX OF WANDS", "완드7": "SEVEN OF WANDS", "완드8": "EIGHT OF WANDS", "완드9": "NINE OF WANDS", "완드10": "TEN OF WANDS", "완드P": "PAGE OF WANDS", "완드Kn": "KNIGHT OF WANDS", "완드Q": "QUEEN OF WANDS", "완드K": "KING OF WANDS", "컵A": "ACE OF CUPS", "컵2": "TWO OF CUPS", "컵3": "THREE OF CUPS", "컵4": "FOUR OF CUPS", "컵5": "FIVE OF CUPS", "컵6": "SIX OF CUPS", "컵7": "SEVEN OF CUPS", "컵8": "EIGHT OF CUPS", "컵9": "NINE OF CUPS", "컵10": "TEN OF CUPS", "컵P": "PAGE OF CUPS", "컵Kn": "KNIGHT OF CUPS", "컵Q": "QUEEN OF CUPS", "컵K": "KING OF CUPS", "소드A": "ACE OF SWORDS", "소드2": "TWO OF SWORDS", "소드3": "THREE OF SWORDS", "소드4": "FOUR OF SWORDS", "소드5": "FIVE OF SWORDS", "소드6": "SIX OF SWORDS", "소드7": "SEVEN OF SWORDS", "소드8": "EIGHT OF SWORDS", "소드9": "NINE OF SWORDS", "소드10": "TEN OF SWORDS", "소드P": "PAGE OF SWORDS", "소드Kn": "KNIGHT OF SWORDS", "소드Q": "QUEEN OF SWORDS", "소드K": "KING OF SWORDS", "펜타A": "ACE OF PENTACLES", "펜타2": "TWO OF PENTACLES", "펜타3": "THREE OF PENTACLES", "펜타4": "FOUR OF PENTACLES", "펜타5": "FIVE OF PENTACLES", "펜타6": "SIX OF PENTACLES", "펜타7": "SEVEN OF PENTACLES", "펜타8": "EIGHT OF PENTACLES", "펜타9": "NINE OF PENTACLES", "펜타10": "TEN OF PENTACLES", "펜타P": "PAGE OF PENTACLES", "펜타Kn": "KNIGHT OF PENTACLES", "펜타Q": "QUEEN OF PENTACLES", "펜타K": "KING OF PENTACLES", "1.기수": "RIDER", "2.클로버": "CLOVER", "3.배": "SHIP", "4.집": "HOUSE", "5.나무": "TREE", "6.구름": "CLOUDS", "7.뱀": "SNAKE", "8.관": "COFFIN", "9.꽃다발": "BOUQUET", "10.낫": "SCYTHE", "11.채찍": "WHIP", "12.새": "BIRDS", "13.아이": "CHILD", "14.여우": "FOX", "15.곰": "BEAR", "16.별": "STAR", "17.황새": "STORK", "18.개": "DOG", "19.탑": "TOWER", "20.정원": "GARDEN", "21.산": "MOUNTAIN", "22.길": "CROSSROADS", "23.쥐": "MICE", "24.하트": "HEART", "25.반지": "RING", "26.책": "BOOK", "27.편지": "LETTER", "28.남성": "GENTLEMAN", "29.여성": "LADY", "30.백합": "LILY", "31.태양": "SUN", "32.달": "MOON", "33.열쇠": "KEY", "34.물고기": "FISH", "35.닻": "ANCHOR", "36.십자가": "CROSS", "1.DESTIN": "DESTINÉE", "DESTIN": "DESTIN", "2.SOLEIL HOMME": "SOLEIL HOMME", "SOLEIL HOMME": "SOLEIL HOMME", "3.LUNE FEMME": "LUNE FEMME", "LUNE FEMME": "LUNE FEMME", "4.NAISSANCE": "NATIVITÉ", "NAISSANCE": "NAISSANCE", "5.SUCCÈS": "RÉUSSITE", "SUCCÈS": "SUCCÈS", "6.ÉLÉVATION": "ÉLÉVATION", "ÉLÉVATION": "ÉLÉVATION", "7.HONNEUR": "HONNEURS", "HONNEUR": "HONNEUR", "11.TRAHISON": "TRAHISON", "TRAHISON": "TRAHISON", "12.DÉPART": "DÉPART", "DÉPART": "DÉPART", "13.INCONSTANCE": "INCONSTANCE", "INCONSTANCE": "INCONSTANCE", "14.DÉCOUVERTE": "DÉCOUVERTE", "DÉCOUVERTE": "DÉCOUVERTE", "15.EAU": "EAU", "EAU": "EAU", "17.INFIRMITÉ": "MALADIE", "INFIRMITÉ": "INFIRMITÉ", "18.CHANGEMENT": "CHANGEMENT", "CHANGEMENT": "CHANGEMENT", "19.ARGENT": "ARGENT", "ARGENT": "ARGENT", "20.INTELLIGENCE": "INTELLIGENCE", "INTELLIGENCE": "INTELLIGENCE", "21.PERTE": "PERTE", "PERTE": "PERTE", "22.AFFAIRE": "AFFAIRE", "AFFAIRE": "AFFAIRE", "23.COMMERCE": "COMMERCE", "COMMERCE": "COMMERCE", "24.NOUVELLE": "NOUVELLE", "NOUVELLE": "NOUVELLE", "25.GAIETÉ": "PLAISIRS", "GAIETÉ": "GAIETÉ", "26.PAIX": "PAIX", "PAIX": "PAIX", "33.JUGEMENT": "JUGEMENT", "JUGEMENT": "JUGEMENT", "38.CATASTROPHE": "CATASTROPHE", "CATASTROPHE": "CATASTROPHE", "운명": "운명", "1.운명": "운명", "남성별": "남성별", "2.남성별": "남성별", "여성별": "여성별", "3.여성별": "여성별", "탄생": "탄생", "4.탄생": "탄생", "성공": "성공", "5.성공": "성공", "고양": "고양", "6.고양": "고양", "명예": "명예", "7.명예": "명예", "사고·우정": "사고·우정", "8.사고·우정": "사고·우정", "시골·건강": "시골·건강", "9.시골·건강": "시골·건강", "선물": "선물", "10.선물": "선물", "배신": "배신", "11.배신": "배신", "출발": "출발", "12.출발": "출발", "변덕": "변덕", "13.변덕": "변덕", "발견": "발견", "14.발견": "발견", "물": "물", "15.물": "물", "가정": "가정", "16.가정": "가정", "질병": "질병", "17.질병": "질병", "변화": "변화", "18.변화": "변화", "돈": "돈", "19.돈": "돈", "지성": "지성", "20.지성": "지성", "도난·손실": "도난·손실", "21.도난·손실": "도난·손실", "사업": "사업", "22.사업": "사업", "교류": "교류", "23.교류": "교류", "소식": "소식", "24.소식": "소식", "즐거움": "즐거움", "25.즐거움": "즐거움", "평화": "평화", "26.평화": "평화", "결합": "결합", "27.결합": "결합", "가족": "가족", "28.가족": "가족", "사랑": "사랑", "29.사랑": "사랑", "식탁": "식탁", "30.식탁": "식탁", "열정": "열정", "31.열정": "열정", "악의": "악의", "32.악의": "악의", "소송": "소송", "33.소송": "소송", "독재": "독재", "34.독재": "독재", "적": "적", "35.적": "적", "협상": "협상", "36.협상": "협상", "불": "불", "37.불": "불", "사고": "사고", "38.사고": "사고", "지지": "지지", "39.지지": "지지", "미모": "미모", "40.미모": "미모", "유산": "유산", "41.유산": "유산", "지혜": "지혜", "42.지혜": "지혜", "명성": "명성", "43.명성": "명성", "우연": "우연", "44.우연": "우연", "행복": "행복", "45.행복": "행복", "불행": "불행", "46.불행": "불행", "불모": "불모", "47.불모": "불모", "숙명": "숙명", "48.숙명": "숙명", "은총": "은총", "49.은총": "은총", "파멸": "파멸", "50.파멸": "파멸", "지연": "지연", "51.지연": "지연", "수도원": "수도원", "52.수도원": "수도원"};
+
+  const ORACLE_BELLINE_KO = ["운명","남성별","여성별","탄생","성공","고양","명예","사고·우정","시골·건강","선물","배신","출발","변덕","발견","물","가정","질병","변화","돈","지성","도난·손실","사업","교류","소식","즐거움","평화","결합","가족","사랑","식탁","열정","악의","소송","독재","적","협상","불","사고","지지","미모","유산","지혜","명성","우연","행복","불행","불모","숙명","은총","파멸","지연","수도원"];
+
+  function getMinorSuit(name) {
+    if (name.startsWith('완드')) return 'WANDS';
+    if (name.startsWith('컵'))  return 'CUPS';
+    if (name.startsWith('소드')) return 'SWORDS';
+    if (name.startsWith('펜타')) return 'PENTACLES';
+    return '';
+  }
+  function getMinorCornerNum(name) {
+    return name.replace(/^(완드|컵|소드|펜타)/, '');
+  }
+  function getPopupData(cardName, tab) {
+    // 메이저
+    const majorIdx = MAJOR_NAMES_KO.indexOf(cardName);
+    if (majorIdx !== -1) {
+      return { corner: MAJOR_ROMAN[majorIdx], top: MAJOR_ROMAN[majorIdx], bottom: CARD_MAP[cardName] || cardName };
+    }
+    // 마이너
+    const suit = getMinorSuit(cardName);
+    if (suit) {
+      return { corner: getMinorCornerNum(cardName), top: suit, bottom: CARD_MAP[cardName] || cardName };
+    }
+    // 레노먼드
+    if (tab === 'len') {
+      const numStr = cardName.match(/^(\d+)\./)?.[1] || '';
+      const engName = CARD_MAP[cardName] || cardName;
+      return { corner: numStr, top: engName, bottom: engName };
+    }
+    // 벨린
+    if (tab === 'bel') {
+      const belIdx = ORACLE_BELLINE_KO.indexOf(cardName);
+      const numStr = belIdx !== -1 ? String(belIdx + 1) : '';
+      const frName = BEL_FR[cardName] || cardName;
+      return { corner: numStr, top: frName, bottom: frName };
+    }
+    return { corner: '', top: cardName, bottom: cardName };
+  }
+
+const BEL_FR = {"운명": "DESTINÉE", "남성별": "ÉTOILE DE L'HOMME", "여성별": "ÉTOILE DE LA FEMME", "탄생": "NATIVITÉ", "성공": "RÉUSSITE", "고양": "ÉLÉVATION", "명예": "HONNEURS", "사고·우정": "PENSÉE-AMITIÉ", "시골·건강": "CAMPAGNE-SANTÉ", "선물": "PRÉSENTS", "배신": "TRAHISON", "출발": "DÉPART", "변덕": "INCONSTANCE", "발견": "DÉCOUVERTE", "물": "L'EAU", "가정": "LES PÉNATES", "질병": "MALADIE", "변화": "CHANGEMENT", "돈": "ARGENT", "지성": "INTELLIGENCE", "도난·손실": "VOL-PERTE", "사업": "ENTREPRISES", "교류": "TRAFIC", "소식": "NOUVELLE", "즐거움": "PLAISIRS", "평화": "PAIX", "결합": "UNION", "가족": "FAMILLE", "사랑": "AMOR", "식탁": "TABLE", "열정": "PASSIONS", "악의": "MÉCHANCETÉ", "소송": "PROCÈS", "독재": "DESPOTISME", "적": "ENNEMIS", "협상": "POURPARLERS", "불": "FEU", "사고": "ACCIDENT", "지지": "APPUI", "미모": "BEAUTÉ", "유산": "HÉRITAGE", "지혜": "SAGESSE", "명성": "RENOMMÉE", "우연": "HASARD", "행복": "BONHEUR", "불행": "INFORTUNE", "불모": "STÉRILITÉ", "숙명": "FATALITÉ", "은총": "GRÂCE", "파멸": "RUINE", "지연": "RETARD", "수도원": "CLOÎTRE"};
+
+  // 카드 앞면에 표시할 영어/프랑스어 이름 반환
+  function getDisplayName(cardName) {
+    // 벨린: BEL_FR로 프랑스어명
+    if (BEL_FR[cardName]) return BEL_FR[cardName];
+    // 나머지: CARD_MAP으로 영어명 (없으면 원본)
+    const mapped = CARD_MAP[cardName];
+    if (mapped && mapped !== cardName) return mapped;
+    return cardName;
+  }
+
+  function getTabByCardName(name) {
+    const stripped = (name || '').replace(/\s*\[(Upright|Reversed)\]\s*$/i, '').trim();
+    if (decks.len.includes(stripped)) return 'len';
+    if (decks.bel.includes(stripped)) return 'bel';
+    return 'rw';
+  }
+
+  function getCardSvg(cardName) {
+    if (!cardName) return null;
+    // 0. Strip orientation tag: "16.탑 [Reversed]" → "16.탑" (for SVG matching; display text is separate)
+    const stripped = cardName.replace(/\s*\[(Upright|Reversed)\]\s*$/i, '').trim();
+    // 1. 공백 정규화: "소드 4" → "소드4", "완드 A" → "완드A"
+    const norm = stripped.replace(/\s+/g, '');
+    // 2. 직접 매핑 (원본 + 정규화)
+    for (const name of [stripped, norm]) {
+      if (CARD_SVG[CARD_MAP[name]]) return CARD_SVG[CARD_MAP[name]];
+      if (CARD_SVG[name]) return CARD_SVG[name];
+    }
+    // 3. 번호 접두사 제거: "17.황새" → "황새"
+    const base = norm.replace(/^\d+\./, '');
+    if (CARD_SVG[CARD_MAP[base]]) return CARD_SVG[CARD_MAP[base]];
+    if (CARD_SVG[base]) return CARD_SVG[base];
+    // 4. CARD_MAP Reversed 검색: 영문명("FOUR OF SWORDS") → SVG 키
+    const engEntry = Object.entries(CARD_MAP).find(([k,v]) => v === stripped || v === norm);
+    if (engEntry) return CARD_SVG[engEntry[1]] || null;
+    // 5. CARD_MAP 부분 매칭: "황새" → "17.황새"
+    const partialKey = Object.keys(CARD_MAP).find(k =>
+      k.replace(/^\d+\./, '') === base
+    );
+    if (partialKey) return CARD_SVG[CARD_MAP[partialKey]] || null;
+    // 6. CARD_SVG 직접 부분 매칭
+    const svgKey = Object.keys(CARD_SVG).find(k =>
+      k === base || k.replace(/^\d+\./, '') === base
+    );
+    if (svgKey) return CARD_SVG[svgKey];
+    return null;
+  }
+
+  /* ── 덱 데이터 ── */
+  const decks = {
+    rw:  ["0.바보","1.마법사","2.고위여사제","3.여황제","4.황제","5.교황","6.연인","7.전차","8.힘","9.은둔자","10.운명수레","11.정의","12.매달린","13.죽음","14.절제","15.악마","16.탑","17.별","18.달","19.태양","20.심판","21.세계","완드A","완드2","완드3","완드4","완드5","완드6","완드7","완드8","완드9","완드10","완드P","완드Kn","완드Q","완드K","컵A","컵2","컵3","컵4","컵5","컵6","컵7","컵8","컵9","컵10","컵P","컵Kn","컵Q","컵K","소드A","소드2","소드3","소드4","소드5","소드6","소드7","소드8","소드9","소드10","소드P","소드Kn","소드Q","소드K","펜타A","펜타2","펜타3","펜타4","펜타5","펜타6","펜타7","펜타8","펜타9","펜타10","펜타P","펜타Kn","펜타Q","펜타K"],
+    maj: ["0.바보","1.마법사","2.고위여사제","3.여황제","4.황제","5.교황","6.연인","7.전차","8.힘","9.은둔자","10.운명수레","11.정의","12.매달린","13.죽음","14.절제","15.악마","16.탑","17.별","18.달","19.태양","20.심판","21.세계"],
+    len: ["1.기수","2.클로버","3.배","4.집","5.나무","6.구름","7.뱀","8.관","9.꽃다발","10.낫","11.채찍","12.새","13.아이","14.여우","15.곰","16.별","17.황새","18.개","19.탑","20.정원","21.산","22.길","23.쥐","24.하트","25.반지","26.책","27.편지","28.남성","29.여성","30.백합","31.태양","32.달","33.열쇠","34.물고기","35.닻","36.십자가"],
+    bel: ["운명", "남성별", "여성별", "탄생", "성공", "고양", "명예", "사고·우정", "시골·건강", "선물", "배신", "출발", "변덕", "발견", "물", "가정", "질병", "변화", "돈", "지성", "도난·손실", "사업", "교류", "소식", "즐거움", "평화", "결합", "가족", "사랑", "식탁", "열정", "악의", "소송", "독재", "적", "협상", "불", "사고", "지지", "미모", "유산", "지혜", "명성", "우연", "행복", "불행", "불모", "숙명", "은총", "파멸", "지연", "수도원"]
+  };
+  const deckNames = { rw: 'Universal Waite', maj: 'Major Arcana', len: 'Lenormand', bel: 'Oracle Belline' };
+
+  let currentTab = 'rw';
+  let state   = { rw: [], maj: [], len: [], bel: [] };
+  // Map 사용 → 삽입 순서(= 뽑은 순서) 유지
+  let flipped = { rw: new Map(), maj: new Map(), len: new Map(), bel: new Map() };
+  let copyText = '';
+  let uiVisible = true;
+  // 정/Reversed 구분 ON/OFF (RW, 메이저 아르카나에만 적용)
+  let dirEnabled = true;
+
+  function getQuestion() { return document.getElementById('question-input').value.trim(); }
+
+  /* ── UI 숨기기/보이기 (카드 여백 탭) ── */
+  function toggleUI() {
+    uiVisible = !uiVisible;
+    document.querySelector('.app-container').classList.toggle('ui-hidden', !uiVisible);
+    // 숨길 때 카드 크기 재계산 (더 커짐)
+    setTimeout(calcCardSize, 280);
+  }
+
+  /* ── 카드 크기 동적 계산 ──
+     각 덱별로 ncols 후보 중 카드가 가장 커지는 값을 선택.
+     len/bel은 마지막 줄에 카드 1장만 남는 ncols 제외.
+     maj는 6열 고정 (사용자 지정). */
+  const colCandidates = {
+    rw:  [6, 7, 8, 9, 10],
+    maj: [6],
+    len: [6, 7, 8, 9],
+    bel: [6, 7, 8, 9]
+  };
+  // 마지막 줄 1장 회피 (rw, len, bel - 보기 어색함 방지)
+  const avoidSingleLast = { rw: true, maj: false, len: true, bel: true };
+  // 실제 채택된 ncols 기록 (다른 함수에서 참조 가능)
+  const cols = { rw: 8, maj: 6, len: 6, bel: 7 };
+
+  function calcCardSize() {
+    const canvas  = document.getElementById('canvas');
+    const wrap    = canvas.querySelector('.deck-wrap');
+    if (!wrap) return;
+    const GAP     = 3;
+    const PAD_H   = 12;
+    const PAD_V   = 12;
+    const tab     = currentTab;
+    const total   = decks[tab].length;
+    const cw = canvas.clientWidth;
+    const ch = canvas.clientHeight;
+
+    let best = { ncols: colCandidates[tab][0], cardW: 0 };
+    for (const ncols of colCandidates[tab]) {
+      const remainder = total % ncols;
+      if (avoidSingleLast[tab] && remainder === 1 && total > ncols) continue;
+
+      const nrows = Math.ceil(total / ncols);
+      const availW = cw - PAD_H - GAP * (ncols - 1);
+      const availH = ch - PAD_V - GAP * (nrows - 1);
+      if (availW <= 0 || availH <= 0) continue;
+
+      const wByWidth  = Math.floor(availW / ncols);
+      const hByHeight = Math.floor(availH / nrows);
+      const wByHeight = Math.floor(hByHeight / 1.7);
+      const cardW = Math.min(wByWidth, wByHeight);
+
+      if (cardW > best.cardW) best = { ncols, cardW };
+    }
+
+    cols[tab] = best.ncols;
+
+    // wrapper 폭을 정확히 ncols개 카드 + 간격으로 → flexbox가 정확히 ncols개씩 줄바꿈
+    const wrapW = best.ncols * best.cardW + GAP * (best.ncols - 1);
+    wrap.style.width = wrapW + 'px';
+
+    document.querySelectorAll(`#canvas .card`).forEach(c => {
+      c.style.width = best.cardW + 'px';
+    });
+  }
+
+  function getQuestion() { return document.getElementById('question-input').value.trim(); }
+
+  function shuffleDeck() {
+    Object.keys(decks).forEach(key => {
+      let temp = [...decks[key]].sort(() => Math.random() - 0.5);
+      state[key] = temp.map(name => ({
+        name,
+        dir: (key === 'rw' || key === 'maj') ? (Math.random() < 0.5 ? 'Reversed' : 'Upright') : 'Upright'
+      }));
+      flipped[key] = new Map();
+    });
+    render();
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    document.getElementById('canvas').className = `deck-canvas grid-${tab}`;
+    updateDirToggleVisibility();
+    render();
+  }
+
+  function updateDirToggleVisibility() {
+    const wrap = document.getElementById('dir-toggle-wrap');
+    const supportsDir = (currentTab === 'rw' || currentTab === 'maj');
+    wrap.classList.toggle('hidden', !supportsDir);
+  }
+
+  function toggleDir(checked) {
+    dirEnabled = checked;
+    render();
+  }
+
+  function toggle(idx) {
+    const map = flipped[currentTab];
+    if (map.has(idx)) {
+      map.delete(idx);
+    } else {
+      map.set(idx, map.size); // 삽입 순서 번호
+    }
+    render();
+  }
+
+  function render() {
+    const canvas = document.getElementById('canvas');
+    canvas.innerHTML = '';
+    // 내부 wrapper — 폭을 정확히 ncols * cardW로 잡아 flexbox 줄바꿈 강제
+    const wrap = document.createElement('div');
+    wrap.className = 'deck-wrap';
+    canvas.appendChild(wrap);
+
+    const cards  = state[currentTab];
+    const map    = flipped[currentTab];
+    // Map 항목을 삽입 순서대로 번호 매기기
+    const orderMap = new Map();
+    let seq = 1;
+    for (const [idx] of map) orderMap.set(idx, seq++);
+
+    cards.forEach((card, i) => {
+      const isFlipped = map.has(i);
+      const div = document.createElement('div');
+      div.className = `card${isFlipped ? ' flipped' : ''}`;
+      div.onclick = (e) => {
+        e.stopPropagation();
+        if (isFlipped) {
+          // 이미 뒤집힌 카드 → 상세 팝업
+          openCardPopup(card.name, currentTab, card.dir);
+        } else {
+          // 뒷면 → 뒤집기
+          toggle(i);
+        }
+      };
+      // 길게 누르면 선택 해제
+      let pressTimer;
+      div.addEventListener('touchstart', () => {
+        if (isFlipped) pressTimer = setTimeout(() => toggle(i), 600);
+      });
+      div.addEventListener('touchend', () => clearTimeout(pressTimer));
+      const dirClass = card.dir === 'Reversed' ? 'rev' : 'up';
+      const dirText  = card.dir === 'Reversed' ? '역' : '정';
+      const showDir  = (currentTab === 'rw' || currentTab === 'maj') && dirEnabled;
+      const seqNum   = orderMap.get(i) ?? '';
+      const frontSvg = isFlipped ? getCardSvg(card.name) : null;
+      const themeClass = getDeckTheme(currentTab);
+      div.innerHTML = `
+        <div class="card-inner">
+          <div class="card-face card-back"></div>
+          <div class="card-face card-front ${themeClass}">
+            <div class="card-num">${isFlipped ? seqNum : ''}</div>
+            <div class="card-svg-mini">
+              ${frontSvg ? `<svg viewBox="0 0 60 60">${frontSvg}</svg>` : ''}
+            </div>
+            <div class="card-name">${getDisplayName(card.name)}</div>
+            ${showDir ? `<div class="dir-tag ${dirClass}">${dirText}</div>` : ''}
+          </div>
+        </div>`;
+      wrap.appendChild(div);
+    });
+
+    // 카드 크기 동적 계산 (렌더 직후)
+    requestAnimationFrame(calcCardSize);
+  }
+
+  function buildAllText() {
+    const q = getQuestion();
+    const sections = [];
+    if (q) sections.push(`[Question]\n${q}`);
+    let anyCard = false;
+    Object.keys(decks).forEach(key => {
+      const map = flipped[key];
+      if (!map.size) return;
+      anyCard = true;
+      // Map은 삽입 순서 보장
+      const lines = [...map.keys()].map((idx, n) => {
+        const c = state[key][idx];
+        const includeDir = (key === 'rw' || key === 'maj') && dirEnabled;
+        return includeDir ? `${n+1}. ${c.name} [${c.dir}]` : `${n+1}. ${c.name}`;
+      });
+      sections.push(`[${deckNames[key]}]\n` + lines.join('\n'));
+    });
+    return { text: sections.join('\n\n'), anyCard };
+  }
+
+  /* ── 현재 뽑은 카드를 구조화된 스냅샷으로 ── */
+  function buildSnapshot() {
+    const q = getQuestion();
+    const deckList = [];
+    Object.keys(decks).forEach(key => {
+      const map = flipped[key];
+      if (!map.size) return;
+      const cards = [...map.keys()].map(idx => {
+        const c = state[key][idx];
+        const includeDir = (key === 'rw' || key === 'maj') && dirEnabled;
+        return { name: c.name, dir: includeDir ? c.dir : null };
+      });
+      deckList.push({ key, deckName: deckNames[key], cards });
+    });
+    return { question: q, decks: deckList, anyCard: deckList.length > 0 };
+  }
+
+  /* 스냅샷 → 사람이 읽는 텍스트 */
+  function snapshotToText(snap) {
+    const parts = [];
+    if (snap.question) parts.push(`[Question]\n${snap.question}`);
+    snap.decks.forEach(d => {
+      const lines = d.cards.map((c, n) =>
+        c.dir ? `${n+1}. ${c.name} [${c.dir}]` : `${n+1}. ${c.name}`);
+      parts.push(`[${d.deckName}]\n` + lines.join('\n'));
+    });
+    return parts.join('\n\n');
+  }
+
+  /* ── 기록 Save소 (localStorage) ── */
+  const HISTORY_KEY = 'tarot_history_v1';
+
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+  }
+  function saveHistoryArr(arr) {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); return true; }
+    catch(e) { return false; }
+  }
+
+  /* 현재 배열을 기록에 Save (중복 방지: 직전 기록과 동일하면 스킵) */
+  function recordReading(readingResult = null) {
+    const snap = buildSnapshot();
+    if (!snap.anyCard) return;
+    const arr = loadHistory();
+    const entry = {
+      id: Date.now(),
+      ts: new Date().toISOString(),
+      question: snap.question,
+      decks: snap.decks,
+      reading: readingResult || null
+    };
+    // 직전 기록과 카드/질문이 완전히 같으면 중복 Save 안 함
+    // (단, 해석 결과가 새로 들어온 경우는 업데이트)
+    if (arr.length) {
+      const prev = arr[0];
+      if (JSON.stringify({q: prev.question, d: prev.decks}) ===
+          JSON.stringify({q: entry.question, d: entry.decks})) {
+        if (readingResult) {
+          // 같은 배열인데 해석이 새로 왔으면 기존 기록에 해석만 추가
+          arr[0].reading = readingResult;
+          saveHistoryArr(arr);
+        }
+        return;
+      }
+    }
+    arr.unshift(entry);
+    if (arr.length > 500) arr.length = 500;
+    saveHistoryArr(arr);
+  }
+
+  /* 날짜 포맷 */
+  function fmtDate(iso) {
+    const d = new Date(iso);
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  }
+
+  /* 카드 요약 (한 줄) */
+  function cardsSummary(decksArr) {
+    return decksArr.map(d => {
+      const names = d.cards.map(c => c.dir ? `${c.name}(${c.dir==='Reversed'?'역':'정'})` : c.name);
+      return `${d.deckName}: ${names.join(', ')}`;
+    }).join(' / ');
+  }
+
+  /* ── 기록 오버레이 열기 ── */
+  function openHistory() {
+    renderHistoryList();
+    document.getElementById('history-overlay').classList.add('show');
+  }
+  function closeHistory(e) {
+    // 배경(오버레이 자체) 클릭이거나 버튼에서 인자 없이 호출된 경우만 닫기
+    if (!e || e.target === document.getElementById('history-overlay')) {
+      document.getElementById('history-overlay').classList.remove('show');
+      document.getElementById('history-main-actions').style.display = '';
+    }
+  }
+
+  function renderHistoryList() {
+    const body = document.getElementById('history-body');
+    const title = document.getElementById('history-title');
+    const mainActions = document.getElementById('history-main-actions');
+    title.textContent = 'My Journal';
+    mainActions.style.display = '';
+    const arr = loadHistory();
+    if (!arr.length) {
+      body.innerHTML = `<div class="history-empty">아직 No saved readings yet.<br>카드를 뽑고 'View Spread'나 'Tarot Reading'을 누르면<br>자동으로 기록돼요.</div>`;
+      return;
+    }
+    const html = arr.map(entry => {
+      const q = entry.question ? escapeHtml(entry.question) : '<span style="color:var(--text-muted)">(질문 없음)</span>';
+      const deckBadges = entry.decks.map(d => `<span class="hi-deck">${escapeHtml(d.deckName)}</span>`).join(' ');
+      const summary = escapeHtml(cardsSummary(entry.decks));
+      return `<div class="history-item" onclick="showHistoryDetail(${entry.id})">
+        <button class="hi-del" onclick="event.stopPropagation();deleteHistory(${entry.id})" title="삭제">✕</button>
+        <div class="hi-date">${fmtDate(entry.ts)}</div>
+        ${deckBadges}
+        <div class="hi-q">${q}</div>
+        <div class="hi-cards">${summary}</div>
+      </div>`;
+    }).join('');
+    body.innerHTML = `<div class="history-list">${html}</div>`;
+  }
+
+  function showHistoryDetail(id) {
+    const arr = loadHistory();
+    const entry = arr.find(e => e.id === id);
+    if (!entry) return;
+    const body = document.getElementById('history-body');
+    const title = document.getElementById('history-title');
+    const mainActions = document.getElementById('history-main-actions');
+    title.textContent = fmtDate(entry.ts);
+    const snap = { question: entry.question, decks: entry.decks };
+    const text = snapshotToText(snap);
+
+    let readingHtml = '';
+    if (entry.reading) {
+      const r = entry.reading;
+      readingHtml = `<div style="margin-top:10px;padding:10px;background:rgba(58,45,110,0.15);border-radius:8px;border:1px solid rgba(201,168,76,0.12);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--accent);letter-spacing:1px;margin-bottom:8px;">AI READING</div>
+        <div style="font-size:11px;line-height:1.8;color:var(--text);">${escapeHtml(r.summary || '')}</div>
+        ${r.starlight_guidance ? `<div style="margin-top:8px;font-size:10.5px;line-height:1.7;color:var(--text-muted);">${escapeHtml(r.starlight_guidance)}</div>` : ''}
+      </div>`;
+    }
+
+    body.innerHTML = `<div class="hist-detail">${escapeHtml(text)}</div>
+      ${readingHtml}
+      <div class="history-actions">
+        <button class="overlay-btn hist-export" onclick="copyHistoryEntry(${entry.id})">복사</button>
+        <button class="overlay-btn overlay-close" onclick="renderHistoryList()">← 목록</button>
+      </div>`;
+    mainActions.style.display = 'none';
+  }
+
+  function copyHistoryEntry(id) {
+    const arr = loadHistory();
+    const entry = arr.find(e => e.id === id);
+    if (!entry) return;
+    const text = snapshotToText({ question: entry.question, decks: entry.decks });
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(()=>showToast('✓ 복사되었습니다')).catch(()=>fallbackCopy(text));
+    } else { fallbackCopy(text); }
+  }
+
+  function deleteHistory(id) {
+    let arr = loadHistory();
+    arr = arr.filter(e => e.id !== id);
+    saveHistoryArr(arr);
+    renderHistoryList();
+    showToast('기록을 삭제했습니다');
+  }
+
+  function clearHistory() {
+    const arr = loadHistory();
+    if (!arr.length) { showToast('삭제할 기록이 없습니다'); return; }
+    if (!confirm(`Save된 기록 ${arr.length}개를 모두 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`)) return;
+    saveHistoryArr([]);
+    renderHistoryList();
+    showToast('모든 기록을 삭제했습니다');
+  }
+
+  /* Export — JSON 파일 다운로드 */
+  function exportHistory() {
+    const arr = loadHistory();
+    if (!arr.length) { showToast('내보낼 기록이 없습니다'); return; }
+    const blob = new Blob([JSON.stringify(arr, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const today = new Date();
+    const p = n => String(n).padStart(2,'0');
+    a.href = url;
+    a.download = `타로기록_${today.getFullYear()}${p(today.getMonth()+1)}${p(today.getDate())}.json`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    showToast('✓ 기록을 내보냈습니다');
+  }
+
+  /* Import — JSON 파일 읽어서 병합 */
+  function importHistory(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        if (!Array.isArray(imported)) throw new Error('형식 오류');
+        const cur = loadHistory();
+        // id 기준 중복 제거하며 병합
+        const map = new Map();
+        [...imported, ...cur].forEach(item => {
+          if (item && item.id) map.set(item.id, item);
+        });
+        let merged = [...map.values()].sort((a,b)=> (b.id||0)-(a.id||0));
+        if (merged.length > 500) merged.length = 500;
+        saveHistoryArr(merged);
+        renderHistoryList();
+        showToast(`✓ ${imported.length}개 Journal imported.`);
+      } catch(err) {
+        showToast('Import 실패 — 올바른 파일이 아닙니다', '#c0392b');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // 같은 파일 다시 선택 가능하게
+  }
+
+  /* HTML 이스케이프 */
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  /* Collapse consecutive line breaks from AI responses (\n\n\n... → single \n), trim edges */
+  function cleanMultiline(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/\r\n/g, '\n')
+      .replace(/\n{2,}/g, '\n')
+      .trim();
+  }
+
+  function showResults() {
+    const map = flipped[currentTab];
+    if (!map.size) { showToast('뽑은 카드가 없습니다', '#c0392b'); return; }
+    const lines = [...map.keys()].map((idx, n) => {
+      const c = state[currentTab][idx];
+      const includeDir = (currentTab === 'rw' || currentTab === 'maj') && dirEnabled;
+      return includeDir ? `${n+1}. ${c.name} [${c.dir}]` : `${n+1}. ${c.name}`;
+    });
+    const q = getQuestion();
+    copyText = (q ? `[Question]\n${q}\n\n` : '') + `[${deckNames[currentTab]}]\n` + lines.join('\n');
+    document.getElementById('overlay-title').textContent = deckNames[currentTab] + ' 리딩 결과';
+    document.getElementById('overlay-content').textContent = (q ? `질문: ${q}\n\n` : '') + lines.join('\n');
+    document.getElementById('overlay').classList.add('show');
+    recordReading();
+  }
+
+  function copyAll() {
+    const { text, anyCard } = buildAllText();
+    if (!anyCard) { showToast('뽑은 카드가 없습니다', '#c0392b'); return; }
+    copyText = text;
+    document.getElementById('overlay-title').textContent = '리딩 결과';
+    document.getElementById('overlay-content').textContent = text;
+    document.getElementById('overlay').classList.add('show');
+    recordReading();
+  }
+
+  /* ── 공통 리딩 오버레이 열기 ── */
+  function openReading(theme, titleText) {
+    const overlay = document.getElementById('reading-overlay');
+    const body    = document.getElementById('reading-body');
+    const title   = document.getElementById('reading-title');
+    overlay.className = `reading-overlay theme-${theme}`;
+    title.textContent = titleText;
+    body.innerHTML = `<div class="reading-loading"><div class="reading-spinner"></div><span>카드를 읽고 있습니다…</span></div>`;
+    overlay.classList.add('show');
+    return body;
+  }
+
+  /* ── Claude Tarot Reading ── */
+  async function askClaude() {
+    const { text, anyCard } = buildAllText();
+    if (!anyCard) { showToast('뽑은 카드가 없습니다', '#c0392b'); return; }
+    const q = getQuestion();
+    const prompt = q
+      ? `Tarot Reading 전문가로서 아래 질문과 카드 배열을 바탕으로 한국어로 깊이 있는 해석을 해주세요. 각 카드의 의미, 카드 간의 흐름, 그리고 질문에 대한 종합적인 통찰을 담아주세요.\n\n${text}`
+      : `Tarot Reading 전문가로서 아래 카드 배열을 한국어로 해석해주세요. 각 카드의 의미와 전체적인 흐름을 연결해서 통찰력 있게 설명해주세요.\n\n${text}`;
+    const body = openReading('claude', '✶ CLAUDE READING');
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await res.json();
+      body.textContent = data?.content?.[0]?.text || '응답을 받지 못했습니다.';
+    } catch (err) {
+      body.textContent = '오류가 발생했습니다. Please try again.';
+    }
+  }
+
+  /* ── Gemini Tarot Reading — Share 시트 ── */
+  async function askGemini() {
+    const { text, anyCard } = buildAllText();
+    if (!anyCard) { showToast('뽑은 카드가 없습니다', '#c0392b'); return; }
+    recordReading();
+
+    const q = getQuestion();
+    const prompt = q
+      ? `[Question]\n${q}\n\n[카드 배열]\n${text}\n\n위 내용을 한국어로 리딩해주세요.`
+      : `[카드 배열]\n${text}\n\n위 카드 배열을 한국어로 리딩해주세요.`;
+
+    // 중계 서버 호출
+    {
+      const overlay = document.getElementById('reading-overlay');
+      const body = document.getElementById('reading-body');
+      const shareBtn = document.getElementById('reading-share-btn');
+      const spreadBadgeWrap = document.getElementById('spread-badge-wrap');
+      const spreadBadgeEl = document.getElementById('spread-badge');
+      const cardsRow = document.getElementById('reading-cards-row');
+
+      const showError = (msg) => {
+        body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;line-height:1.8;">
+          Could not load reading.<br>
+          <span style="font-size:10px;color:#e87060;opacity:0.9;">${msg}</span><br><br>
+          <span style="font-size:11px;opacity:0.7;">Please try again.</span>
+        </div>`;
+        spreadBadgeWrap.style.display = 'none';
+        cardsRow.style.display = 'none';
+        shareBtn.style.display = 'none';
+      };
+
+      document.getElementById('reading-title').textContent = '✶ READING';
+      body.innerHTML = `<div class="reading-loading"><div class="reading-spinner"></div>Reading the cards...</div>`;
+      shareBtn.style.display = 'none';
+      spreadBadgeWrap.style.display = 'none';
+      cardsRow.style.display = 'none';
+      overlay.classList.add('show');
+
+      let result = null;
+      try {
+        result = await callGeminiAPI(prompt);
+      } catch(e) {
+        showError(e.message || 'API 키를 확인해주세요.');
+        return;
+      }
+
+      if (!result) {
+        showError('API 키를 확인해주세요.');
+        return;
+      }
+
+      // Question display (above spread badge)
+      const qWrap = document.getElementById('reading-question-wrap');
+      const qEl   = document.getElementById('reading-question');
+      if (q) {
+        qEl.textContent = '🔮 ' + q;
+        qWrap.style.display = '';
+      } else {
+        qWrap.style.display = 'none';
+      }
+
+      // spread_used 배지
+      if (result.spread_used) {
+        spreadBadgeEl.textContent = '✦ ' + result.spread_used;
+        spreadBadgeWrap.style.display = '';
+      } else {
+        spreadBadgeWrap.style.display = 'none';
+      }
+
+      // SVG 카드줄
+      if (result.cards?.length) {
+        cardsRow.style.display = 'flex';
+        cardsRow.innerHTML = '';
+        result.cards.forEach(c => {
+          const svg = getCardSvg(c.name);
+          const tab = getTabByCardName(c.name);
+          const theme = tab === 'len' ? 'theme-green' : tab === 'bel' ? 'theme-purple' : 'theme-gold';
+          const mini = document.createElement('div');
+          mini.className = 'reading-card-mini ' + theme;
+          mini.innerHTML = svg
+            ? `<svg viewBox="0 0 60 60">${svg}</svg><div class="reading-card-mini-name">${c.name}</div>`
+            : `<div class="reading-card-mini-name">${c.name}</div>`;
+          cardsRow.appendChild(mini);
+        });
+      } else {
+        cardsRow.style.display = 'none';
+      }
+
+      // 결과 렌더링: summary → starlight_guidance → cards
+      let html = '';
+
+      // 1) Overall reading
+      if (result.summary) {
+        const cleanSummary = result.summary.replace(/\bundefined\b/g, '').replace(/\s{2,}/g, ' ').trim();
+        html += `<div style="margin-bottom:12px;line-height:1.9;">${cleanSummary.replace(/\n/g,'<br>')}</div>`;
+      }
+
+      // 2) Starlight Guidance
+      if (result.starlight_guidance) {
+        html += `<div class="starlight-guidance" style="margin-bottom:12px;">
+          <div class="starlight-guidance-title">✦ Starlight Guidance</div>
+          ${cleanMultiline(result.starlight_guidance).replace(/\n/g,'<br>')}
+        </div>`;
+      }
+
+      // 3) Individual cards (deck subheadings, no separator before first)
+      if (result.cards?.length) {
+        html += `<div style="padding:6px 8px;background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid rgba(255,255,255,0.06);">`;
+        let lastDeck = null;
+        result.cards.forEach((c) => {
+          // Deck subheading on change
+          if (c.deck && c.deck !== lastDeck) {
+            if (lastDeck !== null) html += `<div style="height:1px;background:rgba(255,255,255,0.07);margin:6px 0;"></div>`;
+            html += `<div style="font-family:'Cinzel',serif;font-size:9px;color:var(--accent);opacity:0.55;letter-spacing:1.5px;margin-bottom:4px;margin-top:${lastDeck===null?'0':'2px'};">${c.deck}</div>`;
+            lastDeck = c.deck;
+          }
+          const pos = c.position ? ` <span style="opacity:0.65;">· ${c.position}</span>` : '';
+          const archHtml = c.archetype
+            ? `<div style="font-size:9.5px;color:var(--accent);opacity:0.6;margin-bottom:1px;font-style:italic;">Archetype: ${c.archetype}</div>`
+            : '';
+          html += `<div style="padding:2px 0 5px 0;">
+            <div style="font-family:'Cinzel',serif;font-size:10px;color:var(--accent2);margin-bottom:1px;">${c.number}. ${c.name}${pos}</div>
+            ${archHtml}
+            <div style="font-size:11px;line-height:1.6;color:var(--text);">${cleanMultiline(c.meaning).replace(/\n/g,'<br>')}</div>
+          </div>`;
+        });
+        html += `</div>`;
+      }
+      body.innerHTML = html;
+
+      // Share text
+      currentReadingText = (q ? `🔮 Question\n${q}\n\n` : '') +
+        (result.spread_used ? `${result.spread_used}\n\n` : '') +
+        `✨ Reading\n${cleanMultiline(result.summary)}\n\n` +
+        (result.cards?.map(c => `• ${c.name}${c.position ? ' · ' + c.position : ''}: ${cleanMultiline(c.meaning)}`).join('\n') || '') +
+        (result.starlight_guidance ? `\n\n🌟 Starlight Guidance\n${cleanMultiline(result.starlight_guidance)}` : '') +
+        `\n\nWhat does today's card hold for you?\nhttps://starlight-tarot-room.vercel.app`;
+      shareBtn.style.display = '';
+
+      // 기록에 해석 Save
+      recordReading(result);
+      return;
+    }
+
+  }
+
+  function copyToClipboard() {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(copyText)
+        .then(() => showToast('✓ 복사되었습니다'))
+        .catch(() => fallbackCopy(copyText));
+    } else { fallbackCopy(copyText); }
+  }
+  function fallbackCopy(text) {
+    const el = document.getElementById('copy-input');
+    el.value = text; el.select();
+    try { document.execCommand('copy'); showToast('✓ 복사되었습니다'); }
+    catch { showToast('복사 실패 — 수동으로 복사해주세요', '#c0392b'); }
+  }
+
+  function closeOverlay(e) {
+    if (!e || e.target === document.getElementById('overlay'))
+      document.getElementById('overlay').classList.remove('show');
+  }
+
+  function openGuide() {
+    document.getElementById('guide-overlay').classList.add('show');
+  }
+  function closeGuide(e) {
+    if (!e || e.target === document.getElementById('guide-overlay'))
+      document.getElementById('guide-overlay').classList.remove('show');
+  }
+
+  /* ── 카드 팝업 ── */
+  const MAJOR_ROMAN = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI'];
+  const MAJOR_NAMES_KO = ['0.바보','1.마법사','2.고위여사제','3.여황제','4.황제','5.교황','6.연인','7.전차','8.힘','9.은둔자','10.운명수레','11.정의','12.매달린','13.죽음','14.절제','15.악마','16.탑','17.별','18.달','19.태양','20.심판','21.세계'];
+
+  function getDeckTheme(tab) {
+    if (tab === 'len') return 'theme-green';
+    if (tab === 'bel') return 'theme-purple';
+    return 'theme-gold';
+  }
+
+  function openCardPopup(cardName, tab, dir) {
+    const svg    = getCardSvg(cardName);
+    const box    = document.getElementById('card-popup-box');
+    const tlEl   = document.getElementById('p-corner-tl');
+    const brEl   = document.getElementById('p-corner-br');
+    const numEl  = document.getElementById('p-num');
+    const symEl  = document.getElementById('p-symbol');
+    const nameEl = document.getElementById('p-name');
+
+    // 테마
+    box.className = 'card-popup-box ' + getDeckTheme(tab);
+
+    // 덱별 데이터 (코너, 상단, 하단)
+    const pd = getPopupData(cardName, tab);
+
+    // 코너 숫자
+    tlEl.textContent = pd.corner;
+    brEl.textContent = pd.corner;
+
+    // 상단 수트/덱명
+    numEl.textContent = pd.top;
+
+    // 심볼 SVG
+    symEl.innerHTML = svg
+      ? `<svg viewBox="0 0 60 60">${svg}</svg>`
+      : `<div style="font-family:'Cinzel',serif;font-size:9px;opacity:0.35;">${cardName}</div>`;
+
+    // 하단 영어/프랑스어명 + 방향 배지
+    const showDir = (tab === 'rw' || tab === 'maj') && dirEnabled && dir;
+    const dirHtml = showDir
+      ? `<br><span class="p-dir ${dir === 'Reversed' ? 'rev' : 'up'}">${dir}</span>`
+      : '';
+    nameEl.innerHTML = pd.bottom + dirHtml;
+
+    document.getElementById('card-popup').classList.add('show');
+  }
+
+  function closeCardPopup(e) {
+    if (!e || e.target === document.getElementById('card-popup'))
+      document.getElementById('card-popup').classList.remove('show');
+  }
+
+  /* ── 설정 (API 키) ── */
+  /* ── 타이틀 5번 탭 = 설정창 ── */
+  let _titleTaps = 0, _titleTimer = null;
+  function handleTitleTap() {
+    _titleTaps++;
+    clearTimeout(_titleTimer);
+    if (_titleTaps >= 5) { _titleTaps = 0; openSettings(); return; }
+    _titleTimer = setTimeout(() => { _titleTaps = 0; }, 2000);
+  }
+
+  function openSettings() {
+    const saved = localStorage.getItem('gemini_api_key') || '';
+    document.getElementById('gemini-key-input').value = saved;
+    document.getElementById('settings-overlay').classList.add('show');
+  }
+  function closeSettings(e) {
+    if (!e || e.target === document.getElementById('settings-overlay'))
+      document.getElementById('settings-overlay').classList.remove('show');
+  }
+  function saveSettings() {
+    const key = document.getElementById('gemini-key-input').value.trim();
+    if (key) {
+      localStorage.setItem('gemini_api_key', key);
+      showToast('✓ API 키가 Save되었습니다');
+    } else {
+      localStorage.removeItem('gemini_api_key');
+      showToast('API 키가 삭제되었습니다', 'rgba(192,57,43,0.9)');
+    }
+    closeSettings();
+  }
+
+  /* ── Gemini API 호출 ── */
+  async function callGeminiAPI(prompt) {
+    try {
+      const res = await fetch('/api/reading', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+      return await res.json();
+    } catch(e) {
+      console.error('Reading API 오류:', e);
+      throw e;
+    }
+  }
+
+  /* ── Share하기 ── */
+  let currentReadingText = '';
+
+  function shareReading() {
+    if (!currentReadingText) return;
+    if (navigator.share) {
+      navigator.share({
+        title: '✶ 나의 Tarot Reading 결과',
+        text: currentReadingText
+      }).catch(() => {});
+    } else {
+      fallbackCopy(currentReadingText);
+      showToast('✓ 리딩 결과가 복사되었습니다');
+    }
+  }
+
+  function showToast(msg, color = 'rgba(39,174,96,0.9)') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.background = color;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  shuffleDeck();
+  updateDirToggleVisibility();
+  window.addEventListener('resize', () => requestAnimationFrame(calcCardSize));
+
+
+  /* ── 스플래시 ── */
+  (function() {
+    const splash = document.getElementById('splash');
+    const circle = splash.querySelector('.splash-circle');
+    // 1.2초 진입 → 1회 깜빡임(1.0초) → 즉시 페이드아웃
+    setTimeout(() => {
+      circle.style.animation = 'splashTwinkle 1.0s ease-in-out 1 forwards';
+
+      setTimeout(() => {
+        splash.classList.add('hide');
+        setTimeout(() => splash.remove(), 800);
+      }, 1000);
+    }, 1200);
+  })();
+
+  /* ── ? 가이드 힌트 (매 방문마다 표시) ── */
+  (function() {
+    var hint = document.getElementById('guide-hint');
+    if (!hint) return;
+    setTimeout(function() {
+      hint.classList.add('out');
+      setTimeout(function() { hint.remove(); }, 500);
+    }, 4000);
+    var btn = document.querySelector('.guide-btn');
+    if (btn) btn.addEventListener('click', function() {
+      hint.remove();
+    }, { once:true });
+  })();
+
+</script>
+</body>
+</html>
