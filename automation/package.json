@@ -1,0 +1,23 @@
+{
+  "name": "starlight-tarot-automation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Starlight Tarot Room: trend keyword -> tarot question -> recorded reading video -> edited short -> YouTube upload pipeline",
+  "type": "module",
+  "scripts": {
+    "install:browsers": "playwright install chromium",
+    "step1:trends": "node src/steps/1-fetch-trends.js",
+    "step2:question": "node src/steps/2-generate-question.js",
+    "step3:record": "node src/steps/3-record-video.js",
+    "step4:edit": "node src/steps/4-edit-video.js",
+    "step5:upload": "node src/steps/5-upload-youtube.js",
+    "pipeline": "node src/run-pipeline.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "dotenv": "^16.4.5",
+    "fluent-ffmpeg": "^2.1.3",
+    "googleapis": "^144.0.0",
+    "playwright": "^1.49.0"
+  }
+}
