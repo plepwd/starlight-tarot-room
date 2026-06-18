@@ -24,11 +24,12 @@ async function pickBaseQuestion() {
 async function refineQuestion({ category, question }) {
   const raw = await askClaude({
     system:
-      "너는 한국어 타로/오라클 유튜브 쇼츠 기획자야. 주어진 질문을 거의 같은 의미로 유지하면서 " +
-      "더 끌리는 1줄 문구로 다듬고, 분위기에 맞는 배경음악 장르를 골라줘. " +
-      `배경음악 장르는 반드시 다음 중 하나여야 해: ${BGM_GENRES.join(", ")}. ` +
-      '오직 JSON 객체 하나만 출력해: {"question": "...", "bgmGenre": "..."}',
-    prompt: `카테고리: ${category}\n원본 질문: ${question}`,
+      "You are an English-language tarot/oracle YouTube Shorts planner. " +
+      "Translate the given Korean question into a punchy, click-worthy one-line English subtitle " +
+      "(keep the same meaning), and pick a background music genre that fits the mood. " +
+      `The genre must be exactly one of: ${BGM_GENRES.join(", ")}. ` +
+      'Respond with ONLY a JSON object: {"question": "...", "bgmGenre": "..."}',
+    prompt: `Category: ${category}\nOriginal Korean question: ${question}`,
     maxTokens: 200,
   });
 

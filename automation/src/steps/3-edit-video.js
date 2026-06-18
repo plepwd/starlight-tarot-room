@@ -38,20 +38,22 @@ async function generateCatchphrasesAndCta(meta) {
 
   const raw = await askClaude({
     system:
-      "너는 한국어 타로 유튜브 쇼츠 카피라이터야. 각 카드마다 화면에 0.5초 정도 떠 있을 강렬한 한 줄 캐치프레이즈를 만들고, " +
-      "영상 마지막에 보여줄 CTA(행동 유도) 문구도 하나 만들어. " +
-      "캐치프레이즈는 8~16자 내외, 감정을 자극하는 단정적인 어투로. CTA는 '지금 starlight-tarot-room.vercel.app에서 직접 뽑아보세요' 같은 느낌으로. " +
-      '오직 JSON으로만 답해: {"catchphrases": ["...", "..."], "cta": "..."}',
-    prompt: `질문: ${meta.question.question}\n뽑힌 카드 순서: ${cardList}`,
+      "You are an English-language tarot YouTube Shorts copywriter. For each card, write a punchy " +
+      "one-line catchphrase that will be on screen for a couple seconds, and write one CTA " +
+      "(call-to-action) line for the end of the video. " +
+      "Catchphrases: short (4-8 words), emotionally charged, declarative tone. " +
+      "CTA should feel like 'Pull your own card now at starlight-tarot-room.vercel.app'. " +
+      'Respond with ONLY JSON: {"catchphrases": ["...", "..."], "cta": "..."}',
+    prompt: `Question: ${meta.question.question}\nCards drawn in order: ${cardList}`,
     maxTokens: 400,
   });
 
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error(`Claude 응답에서 JSON을 찾지 못함: ${raw}`);
+  if (!jsonMatch) throw new Error(`Could not find JSON in Claude response: ${raw}`);
   const parsed = JSON.parse(jsonMatch[0]);
 
   if (!Array.isArray(parsed.catchphrases) || parsed.catchphrases.length !== flips.length) {
-    throw new Error("캐치프레이즈 개수가 카드 수와 맞지 않음");
+    throw new Error("Number of catchphrases does not match number of cards drawn");
   }
   return parsed;
 }
