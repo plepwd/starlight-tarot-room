@@ -1,4 +1,4 @@
-# Tarot Shorts Automation
+# Major Arcana Shorts Automation
 
 Pipeline for producing the "if THIS card appears... it's a sign" YouTube
 Shorts that promote the Starlight Tarot Room app. Drives the app's own
@@ -6,10 +6,16 @@ Shorts that promote the Starlight Tarot Room app. Drives the app's own
 composites captions and SFX with ffmpeg. BGM and the actual YouTube upload
 stay manual steps.
 
+This is one of (potentially) multiple independent automation pipelines living
+side by side under `automation/` — this one is scoped specifically to the
+22-card Major Arcana deck with static caption pools. It has its own
+`package.json` and dependencies; it doesn't share anything with sibling
+pipelines.
+
 ## Setup
 
 ```
-cd automation
+cd automation/major-arcana
 npm install
 ```
 

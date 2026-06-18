@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  appPath: path.resolve(__dirname, '..', '..', 'index.html'),
+  appPath: path.resolve(__dirname, '..', '..', '..', 'index.html'),
   // Logical CSS viewport used for the actual recording. Must stay <=600px wide
   // (the app's .app-container has max-width:600px) and exactly 9:16 so no
   // crop/letterbox is needed before the ffmpeg upscale to 1080x1920.

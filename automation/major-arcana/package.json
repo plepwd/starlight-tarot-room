@@ -1,7 +1,7 @@
 {
-  "name": "tarot-shorts-automation",
+  "name": "major-arcana-shorts-automation",
   "version": "1.0.0",
-  "description": "Pipeline for recording and editing Starlight Tarot Room YouTube Shorts",
+  "description": "Pipeline for recording and editing Major Arcana Starlight Tarot Room YouTube Shorts",
   "main": "run.js",
   "scripts": {
     "run": "node run.js",
