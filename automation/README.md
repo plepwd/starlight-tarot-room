@@ -13,8 +13,8 @@ Windows 로컬에서 실행하는 자동화 파이프라인: 트렌드 키워드
    ```
 4. `.env.example`을 `.env`로 복사하고 값 채우기
    - `ANTHROPIC_API_KEY`: Claude API 키
-   - `YOUTUBE_API_KEY` / OAuth 클라이언트 정보: Google Cloud Console에서 YouTube Data API v3 사용 설정 후 발급
-   - 업로드(쓰기)는 API Key만으로는 안 되고 OAuth2 (client id/secret + refresh token)가 필요함 — 이건 5단계 구현 시 별도 인증 스크립트로 발급 안내 예정
+   - `YOUTUBE_CLIENT_ID` / `YOUTUBE_CLIENT_SECRET`: Google Cloud Console에서 YouTube Data API v3 사용 설정 후 OAuth 2.0 클라이언트(데스크톱 앱) 발급
+   - `YOUTUBE_REFRESH_TOKEN`: 위 클라이언트 정보를 `.env`에 넣은 뒤 `npm run step0:auth` 실행 → 콘솔에 뜨는 URL을 브라우저로 열어 로그인/동의 → 콘솔에 출력되는 refresh token을 `.env`에 채워넣기 (최초 1회만)
 
 ## 폴더 구조
 
@@ -45,7 +45,12 @@ automation/
 - 트렌드 API 대신 `data/questions-pool.json`에 미리 넣어둔 질문 풀에서 매번 하나를 골라, Claude API로 문구를 다듬고 분위기에 맞는 배경음악 장르를 태깅합니다 (1단계).
 - 각 단계는 `npm run step1:question` 처럼 독립 실행 가능하며, `data/`에 결과를 JSON으로 저장해 다음 단계가 읽습니다. 전체는 `npm run pipeline`으로 순서대로 실행합니다.
 
-현재 상태: 1~3단계 구현 완료 (질문 선정 → 녹화 → 자막/효과음/배경음 합성). 다음은 4단계(YouTube 업로드) 구현.
+현재 상태: 전체 파이프라인(0~4단계) 구현 완료. `npm run pipeline`으로 질문 선정부터 업로드까지 한 번에 실행 가능.
+
+## 4단계 (YouTube 업로드) 참고사항
+
+- Claude API로 제목/설명/태그를 자동 생성하고, `privacyStatus: "private"` + `publishAt`(현재 시각 + `PUBLISH_DELAY_HOURS`, 기본 24시간)으로 업로드 → 유튜브가 지정 시각에 자동으로 공개 전환.
+- 태그에는 SEO 태그 외에 1단계에서 정한 배경음악 장르도 자동 포함됨.
 
 ## 3단계 (영상 편집) 참고사항
 

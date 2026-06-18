@@ -10,12 +10,12 @@
     "step2:record": "node src/steps/2-record-video.js",
     "step3:edit": "node src/steps/3-edit-video.js",
     "step4:upload": "node src/steps/4-upload-youtube.js",
+    "step0:auth": "node src/steps/0-youtube-auth.js",
     "pipeline": "node src/run-pipeline.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
     "dotenv": "^16.4.5",
-    "fluent-ffmpeg": "^2.1.3",
     "googleapis": "^144.0.0",
     "playwright": "^1.49.0"
   }
