@@ -6,3 +6,4 @@ output/final/*
 !output/final/.gitkeep
 data/*.json
 !data/.gitkeep
+!data/questions-pool.json

@@ -6,11 +6,10 @@
   "type": "module",
   "scripts": {
     "install:browsers": "playwright install chromium",
-    "step1:trends": "node src/steps/1-fetch-trends.js",
-    "step2:question": "node src/steps/2-generate-question.js",
-    "step3:record": "node src/steps/3-record-video.js",
-    "step4:edit": "node src/steps/4-edit-video.js",
-    "step5:upload": "node src/steps/5-upload-youtube.js",
+    "step1:question": "node src/steps/1-pick-question.js",
+    "step2:record": "node src/steps/2-record-video.js",
+    "step3:edit": "node src/steps/3-edit-video.js",
+    "step4:upload": "node src/steps/4-upload-youtube.js",
     "pipeline": "node src/run-pipeline.js"
   },
   "dependencies": {
