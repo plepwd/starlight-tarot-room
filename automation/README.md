@@ -29,8 +29,9 @@ automation/
     utils/                  # 공용 설정(config.js)/Claude 클라이언트(anthropic.js)
     run-pipeline.js          # 전체 파이프라인 순차 실행
   assets/
-    sfx/                    # 카드 뒤집는 효과음 (직접 추가)
-    bgm/                    # 분위기별 배경음악 (직접 추가, 장르별 하위 폴더 권장)
+    sfx/flip.mp3            # 카드 뒤집는 효과음 (직접 추가, 파일명 고정: flip.mp3)
+    bgm/                    # 분위기별 배경음악 (직접 추가). 파일명에 장르 키워드를 포함
+                             # 시키면 자동 매칭됨 (예: mystic-1.mp3, lofi-night.mp3)
   data/
     questions-pool.json      # 카테고리별 고정 질문 풀 (직접 추가/수정 가능)
     current-question.json    # 1단계 실행 결과 (다음 단계가 읽음)
@@ -44,4 +45,10 @@ automation/
 - 트렌드 API 대신 `data/questions-pool.json`에 미리 넣어둔 질문 풀에서 매번 하나를 골라, Claude API로 문구를 다듬고 분위기에 맞는 배경음악 장르를 태깅합니다 (1단계).
 - 각 단계는 `npm run step1:question` 처럼 독립 실행 가능하며, `data/`에 결과를 JSON으로 저장해 다음 단계가 읽습니다. 전체는 `npm run pipeline`으로 순서대로 실행합니다.
 
-현재 상태: 1단계(`1-pick-question.js`) 구현 완료. 다음은 2단계(Playwright 화면 녹화) 구현.
+현재 상태: 1~3단계 구현 완료 (질문 선정 → 녹화 → 자막/효과음/배경음 합성). 다음은 4단계(YouTube 업로드) 구현.
+
+## 3단계 (영상 편집) 참고사항
+
+- 자막 폰트: 기본값은 Windows 맑은 고딕(`C:/Windows/Fonts/malgunbd.ttf`). 다른 폰트를 쓰려면 `.env`에 `SUBTITLE_FONT_PATH` 지정.
+- 효과음 파일은 정확히 `assets/sfx/flip.mp3` 경로에 있어야 카드 플립 시점에 자동으로 삽입됨 (없으면 효과음 없이 진행).
+- 배경음악은 `assets/bgm/` 폴더에 넣어두고, 1단계가 고른 `bgmGenre`(예: "lofi chill")의 첫 단어가 파일명에 포함되면 자동으로 골라 씀 (없으면 배경음악 없이 진행).
