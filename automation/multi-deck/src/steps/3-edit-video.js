@@ -80,11 +80,16 @@ function buildDrawtextFilters({ question, flips, catchphrases, cta, ctaStartMs, 
     );
   });
 
+  const ctaEnable = `enable='between(t,${(ctaStartMs / 1000).toFixed(2)},${(ctaEndMs / 1000).toFixed(2)})'`;
   filters.push(
-    `drawtext=fontfile='${FONT_PATH}':text='${escapeDrawtext(`${cta}\n${config.siteUrl}`)}':` +
+    `drawtext=fontfile='${FONT_PATH}':text='${escapeDrawtext(cta)}':` +
       "fontsize=38:fontcolor=white:box=1:boxcolor=black@0.6:boxborderw=14:" +
-      "x=(w-text_w)/2:y=(h-text_h)/2:line_spacing=10:" +
-      `enable='between(t,${(ctaStartMs / 1000).toFixed(2)},${(ctaEndMs / 1000).toFixed(2)})'`
+      `x=(w-text_w)/2:y=(h/2-40):${ctaEnable}`
+  );
+  filters.push(
+    `drawtext=fontfile='${FONT_PATH}':text='${escapeDrawtext(config.siteUrl)}':` +
+      "fontsize=30:fontcolor=#FFD700:box=1:boxcolor=black@0.6:boxborderw=10:" +
+      `x=(w-text_w)/2:y=(h/2+20):${ctaEnable}`
   );
 
   return filters.join(",");
