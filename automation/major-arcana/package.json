@@ -1,0 +1,19 @@
+{
+  "name": "major-arcana-shorts-automation",
+  "version": "1.0.0",
+  "description": "Pipeline for recording and editing Major Arcana Starlight Tarot Room YouTube Shorts",
+  "main": "run.js",
+  "scripts": {
+    "run": "node run.js",
+    "record": "node record.js",
+    "edit": "node edit.js",
+    "thumbnail": "node thumbnail.js",
+    "meta": "node meta.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.56.1"
+  }
+}
