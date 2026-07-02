@@ -27,7 +27,7 @@ function buildPlan(metadata) {
     const tapFlip = evt(events, 'tap_flip', i).t;
     const tapPopup = evt(events, 'tap_popup', i).t;
     const holdEnd = evt(events, 'popup_hold_end', i).t;
-    ticks.push(tapFlip / 1000, tapPopup / 1000);
+    ticks.push(tapFlip / 1000);
 
     const reaction = drawReaction({ drawIndex: i, total, isMatch: d.isMatch, overallSuccess: success });
     captions.push({ text: reaction, startSec: tapFlip / 1000, endSec: tapPopup / 1000, y: 'h-380' });
