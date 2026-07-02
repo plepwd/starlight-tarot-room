@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { askClaude } from "../utils/anthropic.js";
+import { askGemini } from "../utils/gemini.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const POOL_PATH = path.join(__dirname, "../../data/questions-pool.json");
@@ -22,7 +22,7 @@ async function pickBaseQuestion() {
 }
 
 async function refineQuestion({ category, question }) {
-  const raw = await askClaude({
+  const raw = await askGemini({
     system:
       "You are an English-language tarot/oracle YouTube Shorts planner. " +
       "Translate the given Korean question into a punchy, click-worthy one-line English subtitle " +
@@ -35,7 +35,7 @@ async function refineQuestion({ category, question }) {
 
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
-    throw new Error(`Claude 응답에서 JSON을 찾지 못함: ${raw}`);
+    throw new Error(`Gemini 응답에서 JSON을 찾지 못함: ${raw}`);
   }
   return JSON.parse(jsonMatch[0]);
 }

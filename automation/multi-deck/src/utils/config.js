@@ -6,7 +6,7 @@ function required(name, fallback) {
 }
 
 export const config = {
-  anthropicApiKey: required("ANTHROPIC_API_KEY"),
+  geminiApiKey: required("GEMINI_API_KEY"),
   siteUrl: required("SITE_URL", "https://starlight-tarot-room.vercel.app"),
   ffmpegPath: required("FFMPEG_PATH", "ffmpeg"),
   targetRegion: required("TARGET_REGION", "KR"),

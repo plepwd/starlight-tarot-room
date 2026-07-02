@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { askClaude } from "../utils/anthropic.js";
+import { askGemini } from "../utils/gemini.js";
 import { runFfmpeg, escapeDrawtext } from "../utils/ffmpeg.js";
 import { config } from "../utils/config.js";
 
@@ -36,7 +36,7 @@ async function generateCatchphrasesAndCta(meta) {
   const flips = meta.events.filter((e) => e.type === "card-flip");
   const cardList = flips.map((f) => `${f.deck}: ${f.cardName}`).join(", ");
 
-  const raw = await askClaude({
+  const raw = await askGemini({
     system:
       "You are an English-language tarot YouTube Shorts copywriter. For each card, write a punchy " +
       "one-line catchphrase that will be on screen for a couple seconds, and write one CTA " +
@@ -49,7 +49,7 @@ async function generateCatchphrasesAndCta(meta) {
   });
 
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error(`Could not find JSON in Claude response: ${raw}`);
+  if (!jsonMatch) throw new Error(`Could not find JSON in Gemini response: ${raw}`);
   const parsed = JSON.parse(jsonMatch[0]);
 
   if (!Array.isArray(parsed.catchphrases) || parsed.catchphrases.length !== flips.length) {

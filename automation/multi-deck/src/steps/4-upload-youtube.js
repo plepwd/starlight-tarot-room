@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import fsSync from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { askClaude } from "../utils/anthropic.js";
+import { askGemini } from "../utils/gemini.js";
 import { getYoutubeClient } from "../utils/youtube.js";
 import { config } from "../utils/config.js";
 
@@ -18,7 +18,7 @@ async function loadEditMeta() {
 async function generateMetadata(editMeta) {
   const cardNames = editMeta.flips.map((f) => f.cardName).join(", ");
 
-  const raw = await askClaude({
+  const raw = await askGemini({
     system:
       "너는 한국어 유튜브 쇼츠 SEO 전문가야. 타로 리딩 쇼츠 영상의 조회수를 최대화할 " +
       "제목/설명/태그를 만들어줘. 제목은 32자 이하, 궁금증과 클릭을 유발하는 어투, 이모지 1~2개 허용. " +
@@ -31,7 +31,7 @@ async function generateMetadata(editMeta) {
   });
 
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error(`Claude 응답에서 JSON을 찾지 못함: ${raw}`);
+  if (!jsonMatch) throw new Error(`Gemini 응답에서 JSON을 찾지 못함: ${raw}`);
   const parsed = JSON.parse(jsonMatch[0]);
 
   const genreTag = editMeta.question.bgmGenre.replace(/\s+/g, "");
