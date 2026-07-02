@@ -71,7 +71,11 @@ async function recordOnce({ card, question, outDir, keepDir, seed }) {
     const hitIdx = await page.evaluate((key) => {
       return state.maj.findIndex(c => c.name === key);
     }, koKey);
-    if (seed === 'success') forcedOrder = [hitIdx, ...[...Array(22).keys()].filter(i => i !== hitIdx)];
+    if (seed === 'success') {
+      const others = [...Array(22).keys()].filter(i => i !== hitIdx);
+      // Target card appears on the last draw for maximum suspense
+      forcedOrder = [...others.slice(0, total - 1), hitIdx, ...others.slice(total - 1)];
+    }
     else forcedOrder = [...Array(22).keys()].filter(i => i !== hitIdx);
   }
 
