@@ -22,7 +22,7 @@ export function runFfmpeg(args) {
 export function escapeDrawtext(text) {
   return text
     .replace(/\\/g, "\\\\")
-    .replace(/[‘’`]/g, "’")  // replace all apostrophe variants with right single quotation mark
+    .replace(/['‘’`]/g, "’")  // replace all apostrophe variants with right single quotation mark
     .replace(/:/g, "\\:")
     .replace(/%/g, "\\%")
     .replace(/\[/g, "\\[")
