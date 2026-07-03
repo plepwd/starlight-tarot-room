@@ -8,12 +8,16 @@
     "record": "node record.js",
     "edit": "node edit.js",
     "thumbnail": "node thumbnail.js",
-    "meta": "node meta.js"
+    "meta": "node meta.js",
+    "upload": "node upload.js",
+    "auth": "node youtube-auth.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.7",
+    "googleapis": "^144.0.0",
     "playwright": "^1.56.1"
   }
 }
